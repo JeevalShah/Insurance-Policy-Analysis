@@ -1,0 +1,5 @@
+pymupdf 
+pdfplumber 
+unstructured 
+python-docx
+pytesseract
