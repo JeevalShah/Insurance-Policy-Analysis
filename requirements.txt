@@ -3,3 +3,7 @@ pdfplumber
 unstructured 
 python-docx
 pytesseract
+faiss-cpu
+sentence-transformers
+numpy 
+python-docx

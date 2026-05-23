@@ -1,0 +1,66 @@
+[
+    {
+        "clause_id": "1.1",
+        "text": "Customers must submit vehicle accident claims within 30 calendar days from the date of the accident."
+    },
+    {
+        "clause_id": "1.2",
+        "text": "All claims must include: 1. FIR copy 2. Vehicle registration certificate 3. Driver license 4. Photographic evidence of damage"
+    },
+    {
+        "clause_id": "1.3",
+        "text": "Claims lacking mandatory documentation shall be marked as incomplete."
+    },
+    {
+        "clause_id": "1.4",
+        "text": "Incomplete claims shall not proceed to fraud assessment.\nSECTION 2 — Fraud Assessment"
+    },
+    {
+        "clause_id": "2.1",
+        "text": "All claims exceeding INR 2,00,000 must undergo fraud risk evaluation."
+    },
+    {
+        "clause_id": "2.2",
+        "text": "Fraud risk evaluation shall include: 1. Historical claims matching 2. Damage consistency analysis 3. Metadata verification 4. Geo-location consistency checks"
+    },
+    {
+        "clause_id": "2.3",
+        "text": "Claims identified as high-risk must be escalated to manual review."
+    },
+    {
+        "clause_id": "2.4",
+        "text": "Manual review officers must maintain explainable audit records for every rejected claim.\nSECTION 3 — CCTV and Multimedia Validation"
+    },
+    {
+        "clause_id": "3.1",
+        "text": "If CCTV footage is available, it shall be considered supplementary evidence."
+    },
+    {
+        "clause_id": "3.2",
+        "text": "Dashcam footage may be used for accident chronology reconstruction."
+    },
+    {
+        "clause_id": "3.3",
+        "text": "Video evidence must not be retained for more than 180 days unless legally mandated."
+    },
+    {
+        "clause_id": "3.4",
+        "text": "Facial recognition technologies shall not be used during claims investigation.\nSECTION 4 — Data Retention"
+    },
+    {
+        "clause_id": "4.1",
+        "text": "Customer claim records must be retained for 7 years."
+    },
+    {
+        "clause_id": "4.2",
+        "text": "Personally identifiable information shall be encrypted at rest."
+    },
+    {
+        "clause_id": "4.3",
+        "text": "Audit logs must be immutable."
+    },
+    {
+        "clause_id": "4.4",
+        "text": "Every automated fraud decision must be explainable and reproducible."
+    }
+]
