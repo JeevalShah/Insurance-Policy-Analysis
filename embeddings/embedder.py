@@ -1,9 +1,7 @@
 import json
-import pickle
-import numpy as np
 import faiss
-
-from sklearn.feature_extraction.text import TfidfVectorizer
+import numpy as np
+import ollama
 
 
 # LOAD CLAUSES
@@ -16,48 +14,53 @@ with open(
     clauses = json.load(f)
 
 
-# EXTRACT TEXTS
 texts = [
     clause["text"]
     for clause in clauses
 ]
 
 
-# TF-IDF VECTORIZATION
-vectorizer = TfidfVectorizer()
-
-X = vectorizer.fit_transform(texts)
+embeddings = []
 
 
-# CONVERT TO DENSE FLOAT32
-dense_vectors = X.toarray().astype('float32')
+# GENERATE EMBEDDINGS
+for text in texts:
+
+    response = ollama.embeddings(
+
+        model="nomic-embed-text",
+
+        prompt=text
+    )
+
+    embeddings.append(
+        response["embedding"]
+    )
+
+
+# CONVERT TO NUMPY
+vectors = np.array(
+    embeddings,
+    dtype='float32'
+)
 
 
 # CREATE FAISS INDEX
-dimension = dense_vectors.shape[1]
+dimension = vectors.shape[1]
 
 index = faiss.IndexFlatL2(dimension)
 
-index.add(dense_vectors)
+index.add(vectors)
 
 
-# SAVE FAISS INDEX
+# SAVE INDEX
 faiss.write_index(
     index,
     "data/faiss_index.bin"
 )
 
 
-# SAVE VECTORIZER
-with open(
-    "data/vectorizer.pkl",
-    "wb"
-) as f:
-
-    pickle.dump(vectorizer, f)
-
-
-# SAVE CLAUSE MAPPING
+# SAVE CLAUSE MAP
 with open(
     "data/clause_mapping.json",
     "w",
@@ -72,4 +75,6 @@ with open(
     )
 
 
-print(f"\nStored {index.ntotal} vectors in FAISS")
+print(
+    f"\nStored {index.ntotal} semantic embeddings"
+)

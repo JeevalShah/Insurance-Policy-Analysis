@@ -1,25 +1,16 @@
 import json
-import pickle
 import numpy as np
 import faiss
+import ollama
 
 
-
+# LOAD INDEX
 index = faiss.read_index(
     "data/faiss_index.bin"
 )
 
 
-
-with open(
-    "data/vectorizer.pkl",
-    "rb"
-) as f:
-
-    vectorizer = pickle.load(f)
-
-
-
+# LOAD CLAUSES
 with open(
     "data/clause_mapping.json",
     "r",
@@ -31,28 +22,38 @@ with open(
 
 def search(query, top_k=5):
 
-    query_vector = vectorizer.transform(
-        [query]
+    response = ollama.embeddings(
+
+        model="nomic-embed-text",
+
+        prompt=query
     )
 
-    query_dense = query_vector.toarray().astype(
-        'float32'
+    query_embedding = np.array(
+        [response["embedding"]],
+        dtype='float32'
     )
 
     distances, indices = index.search(
-        query_dense,
+        query_embedding,
         top_k
     )
 
     results = []
 
+    MAX_DISTANCE = 400
+
     for i, idx in enumerate(indices[0]):
+
+     distance = float(
+        distances[0][i]
+     )
+
+     if distance <= MAX_DISTANCE:
 
         results.append({
 
-            "distance": float(
-                distances[0][i]
-            ),
+            "distance": distance,
 
             "clause": clauses[idx]
         })
