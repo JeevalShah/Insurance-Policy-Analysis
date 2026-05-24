@@ -7,3 +7,5 @@ faiss-cpu
 sentence-transformers
 numpy 
 python-docx
+scikit-learn
+

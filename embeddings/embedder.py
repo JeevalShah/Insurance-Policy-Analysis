@@ -1,16 +1,14 @@
-from sentence_transformers import SentenceTransformer
 import json
-import faiss
+import pickle
 import numpy as np
+import faiss
+
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 
-model = SentenceTransformer(
-    'all-MiniLM-L6-v2'
-)
-
-
+# LOAD CLAUSES
 with open(
-    "data/structured_clauses.json",  
+    "data/structured_clauses.json",
     "r",
     encoding="utf-8"
 ) as f:
@@ -18,23 +16,60 @@ with open(
     clauses = json.load(f)
 
 
+# EXTRACT TEXTS
 texts = [
     clause["text"]
     for clause in clauses
 ]
 
 
-embeddings = model.encode(texts)
+# TF-IDF VECTORIZATION
+vectorizer = TfidfVectorizer()
+
+X = vectorizer.fit_transform(texts)
 
 
-dimension = embeddings.shape[1]
+# CONVERT TO DENSE FLOAT32
+dense_vectors = X.toarray().astype('float32')
+
+
+# CREATE FAISS INDEX
+dimension = dense_vectors.shape[1]
 
 index = faiss.IndexFlatL2(dimension)
 
-index.add(
-    np.array(embeddings).astype('float32')
+index.add(dense_vectors)
+
+
+# SAVE FAISS INDEX
+faiss.write_index(
+    index,
+    "data/faiss_index.bin"
 )
 
-print(
-    f"Stored {index.ntotal} clause embeddings"
-)
+
+# SAVE VECTORIZER
+with open(
+    "data/vectorizer.pkl",
+    "wb"
+) as f:
+
+    pickle.dump(vectorizer, f)
+
+
+# SAVE CLAUSE MAPPING
+with open(
+    "data/clause_mapping.json",
+    "w",
+    encoding="utf-8"
+) as f:
+
+    json.dump(
+        clauses,
+        f,
+        indent=4,
+        ensure_ascii=False
+    )
+
+
+print(f"\nStored {index.ntotal} vectors in FAISS")
