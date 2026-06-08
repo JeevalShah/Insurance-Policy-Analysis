@@ -1,5 +1,6 @@
 import sys
 import os
+import ollama
 
 sys.path.append(
     os.path.abspath(
@@ -13,6 +14,36 @@ sys.path.append(
 from retrieval.semanticsearch import search
 
 from reasoning.dependency_graph import DEPENDENCIES
+def generate_reasoning(trigger, clause_text):
+
+    prompt = f"""
+You are an insurance compliance analyst.
+
+Regulatory Trigger:
+{trigger}
+
+Retrieved Clause:
+{clause_text}
+
+Task:
+Explain in 1-2 concise sentences why this clause may be impacted by the regulatory trigger.
+
+Focus on compliance implications.
+Do not repeat the clause verbatim.
+Keep the explanation under 50 words.
+"""
+
+    response = ollama.chat(
+        model="llama3",
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ]
+    )
+
+    return response["message"]["content"].strip()
 
 def analyze_impact(query):
 
@@ -22,14 +53,15 @@ def analyze_impact(query):
 
 
    
-    direct_impacts = set()
-
+    direct_impacts = {}
 
     for r in retrieved:
 
-        clause_id = r["clause"]["clause_id"]
+     clause_id = r["clause"]["clause_id"]
 
-        direct_impacts.add(clause_id)
+    direct_impacts[clause_id] = {
+        "text": r["clause"]["text"]
+    }
 
 
     
@@ -37,7 +69,7 @@ def analyze_impact(query):
     indirect_impacts = set()
 
 
-    for clause_id in direct_impacts:
+    for clause_id in direct_impacts.keys():
 
         if clause_id in DEPENDENCIES:
 
@@ -45,19 +77,28 @@ def analyze_impact(query):
 
             for dep in affected:
 
-                if dep not in direct_impacts:
-
+                if dep not in direct_impacts.keys():
                     indirect_impacts.add(dep)
+    for clause_id in direct_impacts:
+
+     clause_text = direct_impacts[clause_id]["text"]
+
+     reasoning = generate_reasoning(
+        query,
+        clause_text
+    )
+
+    direct_impacts[clause_id]["reasoning"] = reasoning
 
 
  
 
     return {
 
-        "direct": list(direct_impacts),
+    "direct": direct_impacts,
 
-        "indirect": list(indirect_impacts)
-    }
+    "indirect": indirect_impacts
+}
 
 
 if __name__ == "__main__":
@@ -72,9 +113,17 @@ if __name__ == "__main__":
 
     print("\nDIRECTLY IMPACTED:\n")
 
-    for d in result["direct"]:
+    for clause_id, data in result["direct"].items():
 
-        print(f"Clause {d}")
+     print(f"Clause {clause_id}")
+
+     print(f"\nText:")
+     print(data["text"])
+
+     print(f"\nReasoning:")
+     print(data["reasoning"])
+
+    print("\n" + "="*60 + "\n")
 
 
     print("\nINDIRECTLY IMPACTED:\n")
