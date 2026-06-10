@@ -2,36 +2,22 @@ import re
 import json
 
 
-CLAUSE_PATTERN = r'Clause\s+(\d+\.\d+)'
+# CLAUSE_PATTERN = r'Clause\s+(\d+\.\d+)'
 
 
 def split_into_clauses(text):
 
-    matches = list(
-        re.finditer(CLAUSE_PATTERN, text)
-    )
+    chunk_size = 1000
 
     clauses = []
 
-    for i in range(len(matches)):
+    for i in range(0, len(text), chunk_size):
 
-        clause_id = matches[i].group(1)
-
-        start = matches[i].end()
-
-        if i + 1 < len(matches):
-
-            end = matches[i + 1].start()
-
-        else:
-
-            end = len(text)
-
-        clause_text = text[start:end].strip()
+        chunk = text[i:i+chunk_size]
 
         clauses.append({
-            "clause_id": clause_id,
-            "text": clause_text
+            "clause_id": f"C{i//chunk_size + 1}",
+            "text": chunk.strip()
         })
 
     return clauses

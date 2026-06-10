@@ -89,7 +89,7 @@ def extract_text(pdf_path):
 
 if __name__ == "__main__":
 
-    pdf_path = "data/raw/sample-policy-sbi.pdf"
+    pdf_path = "data/raw/Actual/Bundled_Private_Car_Insurance_Policy_Wording.pdf"
 
     pages = extract_text(pdf_path)
 
