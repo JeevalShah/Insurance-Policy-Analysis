@@ -8,4 +8,4 @@ sentence-transformers
 numpy 
 python-docx
 scikit-learn
-
+ollama

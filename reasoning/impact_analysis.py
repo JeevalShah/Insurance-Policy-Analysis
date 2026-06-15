@@ -47,27 +47,18 @@ Keep the explanation under 50 words.
 
 def analyze_impact(query):
 
-   
-
     retrieved = search(query)
 
-
-   
     direct_impacts = {}
 
     for r in retrieved:
+        clause_id = r["clause"]["clause_id"]
 
-     clause_id = r["clause"]["clause_id"]
-
-    direct_impacts[clause_id] = {
-        "text": r["clause"]["text"]
-    }
-
-
-    
+        direct_impacts[clause_id] = {
+            "text": r["clause"]["text"]
+        }
 
     indirect_impacts = set()
-
 
     for clause_id in direct_impacts.keys():
 
@@ -76,30 +67,24 @@ def analyze_impact(query):
             affected = DEPENDENCIES[clause_id]
 
             for dep in affected:
-
                 if dep not in direct_impacts.keys():
                     indirect_impacts.add(dep)
+
     for clause_id in direct_impacts:
 
-     clause_text = direct_impacts[clause_id]["text"]
+        clause_text = direct_impacts[clause_id]["text"]
 
-     reasoning = generate_reasoning(
-        query,
-        clause_text
-    )
+        reasoning = generate_reasoning(
+            query,
+            clause_text
+        )
 
-    direct_impacts[clause_id]["reasoning"] = reasoning
-
-
- 
+        direct_impacts[clause_id]["reasoning"] = reasoning
 
     return {
-
-    "direct": direct_impacts,
-
-    "indirect": indirect_impacts
-}
-
+        "direct": direct_impacts,
+        "indirect": indirect_impacts
+    }
 
 if __name__ == "__main__":
 
