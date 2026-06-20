@@ -1,6 +1,7 @@
 import sys
 import os
 import ollama
+from relationshipclassifier import classify_relationship
 
 sys.path.append(
     os.path.abspath(
@@ -14,7 +15,7 @@ sys.path.append(
 from retrieval.semanticsearch import search
 
 from reasoning.dependency_graph import DEPENDENCIES
-def generate_reasoning(trigger, clause_text):
+def generate_reasoning(trigger, clause_text,relationship):
 
     prompt = f"""
 You are an insurance compliance analyst.
@@ -24,13 +25,14 @@ Regulatory Trigger:
 
 Retrieved Clause:
 {clause_text}
+Relationship Classification:
+{relationship}
 
-Task:
-Explain in 1-2 concise sentences why this clause may be impacted by the regulatory trigger.
+Explain in 1-2 concise sentences why this relationship exists.
 
-Focus on compliance implications.
-Do not repeat the clause verbatim.
-Keep the explanation under 50 words.
+Do not speculate.
+Base your answer only on the trigger and clause.
+Maximum 50 words.
 """
 
     response = ollama.chat(
@@ -73,12 +75,19 @@ def analyze_impact(query):
     for clause_id in direct_impacts:
 
         clause_text = direct_impacts[clause_id]["text"]
+        relationship = classify_relationship(
+    query,
+    clause_text
+)
 
         reasoning = generate_reasoning(
             query,
-            clause_text
+            clause_text,
+            relationship
         )
+  
 
+        direct_impacts[clause_id]["relationship"] = relationship
         direct_impacts[clause_id]["reasoning"] = reasoning
 
     return {
@@ -104,6 +113,9 @@ if __name__ == "__main__":
 
      print(f"\nText:")
      print(data["text"])
+
+     print(f"\nRelationship:")
+     print(data["relationship"])
 
      print(f"\nReasoning:")
      print(data["reasoning"])
