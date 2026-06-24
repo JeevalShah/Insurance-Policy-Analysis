@@ -1,70 +1,1760 @@
 [
     {
+        "faiss_id": 0,
         "clause_id": "Preamble",
-        "text": "DOCUMENT 1\nMotor Insurance Claims Compliance Policy\nDocument ID: MOTOR_CLAIMS_POLICY_001 Version: 2024 Department: Claims Processing\nSECTION 1 — Claims Submission"
+        "parent_id": null,
+        "text": "PAGE 1\nGROUP HEALTH INSURANCE\nPOLICY WORDING\nPREAMBLE\nThis Policy is issued to the Insured based on the Proposal and\ndeclaration together with any statement, report or other document\nwhich shall be the basis of this contract and shall be deemed to be\nincorporated herein, to Insurer upon payment of the Premium. This\nPolicy records the agreement between Insurer and Insured and sets\nout the terms of insurance and the obligations of each party.\nThe Policy, the Schedule and any Endorsement shall be read together\nand any word or expression to which a specific meaning has been\nattached in any part of this Policy or of Schedule shall bear such\nmeaning whenever it may appear.\nSubject to the terms, Conditions, exclusions and definitions\ncontained herein or endorsed or otherwise expressed hereon,\nInsurer undertakes to pay the Insured Person the hospitalization\nexpenses arising out of an Injury or Illness/Disease and that are\nreasonably and necessarily incurred by or on behalf of such Insured\nPerson, but not exceeding the sum Insured for the insured person as\nmentioned in the schedule of the policy. The following benefits are\ncovered under this policy subject to the sub-limits as stipulated in the\npolicy contract."
     },
     {
-        "clause_id": "1.1",
-        "text": "Clause 1.1\nCustomers must submit vehicle accident claims within 30 calendar days from the date of the accident."
+        "faiss_id": 1,
+        "clause_id": "1",
+        "parent_id": null,
+        "text": "1. Room, Boarding Expenses"
     },
     {
-        "clause_id": "1.2",
-        "text": "Clause 1.2\nAll claims must include: 1. FIR copy 2. Vehicle registration certificate 3. Driver license 4. Photographic evidence of damage"
+        "faiss_id": 2,
+        "clause_id": "2",
+        "parent_id": null,
+        "text": "2. Medical Practitioners fees"
     },
     {
-        "clause_id": "1.3",
-        "text": "Clause 1.3\nClaims lacking mandatory documentation shall be marked as incomplete."
+        "faiss_id": 3,
+        "clause_id": "3",
+        "parent_id": null,
+        "text": "3. Intensive Care Unit"
     },
     {
-        "clause_id": "1.4",
-        "text": "Clause 1.4\nIncomplete claims shall not proceed to fraud assessment.\nSECTION 2 — Fraud Assessment"
+        "faiss_id": 4,
+        "clause_id": "4",
+        "parent_id": null,
+        "text": "4. Nursing Expenses"
     },
     {
-        "clause_id": "2.1",
-        "text": "Clause 2.1\nAll claims exceeding INR 2,00,000 must undergo fraud risk evaluation."
+        "faiss_id": 5,
+        "clause_id": "5",
+        "parent_id": null,
+        "text": "5. Surgical fees, operating theatre, Anesthetist, Anesthesia, Blood,\nOxygen and their administration,"
     },
     {
-        "clause_id": "2.2",
-        "text": "Clause 2.2\nFraud risk evaluation shall include: 1. Historical claims matching 2. Damage consistency analysis 3. Metadata verification 4. Geo-location consistency checks"
+        "faiss_id": 6,
+        "clause_id": "6",
+        "parent_id": null,
+        "text": "6. Physio therapy while being treated as inpatient and being part of\nthe treatment."
     },
     {
-        "clause_id": "2.3",
-        "text": "Clause 2.3\nClaims identified as high-risk must be escalated to manual review."
+        "faiss_id": 7,
+        "clause_id": "7",
+        "parent_id": null,
+        "text": "7. Drugs and medicines consumed during hospitalization period."
     },
     {
-        "clause_id": "2.4",
-        "text": "Clause 2.4\nManual review officers must maintain explainable audit records for every rejected claim.\nSECTION 3 — CCTV and Multimedia Validation"
+        "faiss_id": 8,
+        "clause_id": "8",
+        "parent_id": null,
+        "text": "8. Hospital miscellaneous services (such as laboratory, X-ray,\ndiagnostic tests)"
     },
     {
-        "clause_id": "3.1",
-        "text": "Clause 3.1\nIf CCTV footage is available, it shall be considered supplementary evidence."
+        "faiss_id": 9,
+        "clause_id": "9",
+        "parent_id": null,
+        "text": "9. Dressing, ordinary splints and plaster casts."
     },
     {
-        "clause_id": "3.2",
-        "text": "Clause 3.2\nDashcam footage may be used for accident chronology reconstruction."
+        "faiss_id": 10,
+        "clause_id": "1",
+        "parent_id": null,
+        "text": "1. Room, Board & Nursing Charges as provided by the hospital: up to\n1% of the Sum Insured max Rs.1500/- for Normal Room per day. If\nadmitted into Intensive Care Unit up to 2% of the Sum Insured per\nday max Rs.2500/-. In case the insured opts for a higher room\ncategory than his eligibility the same can be covered upon specific\nacceptance by the insurer or Administrator. In such a case we shall\nnot recover any expenses towards proportionate deductions\nother than the defined 'associate medical expenses'"
     },
     {
-        "clause_id": "3.3",
-        "text": "Clause 3.3\nVideo evidence must not be retained for more than 180 days unless legally mandated."
+        "faiss_id": 11,
+        "clause_id": "2",
+        "parent_id": null,
+        "text": "2. Medical Practitioner and Specialists Fees (Including\nTeleconsultation)"
     },
     {
-        "clause_id": "3.4",
-        "text": "Clause 3.4\nFacial recognition technologies shall not be used during claims investigation.\nSECTION 4 — Data Retention"
+        "faiss_id": 12,
+        "clause_id": "3",
+        "parent_id": null,
+        "text": "3. Anesthesia, Blood, Oxygen, Operation Theatre charges, Surgical\nAppliances, Medicines & Drugs, Diagnostic Materials and X-ray,\nDialysis, Chemotherapy, Radiotherapy, Cost of Pacemaker,\nprosthesis/internal implants and any medical expenses incurred\nwhich is integral part of the operation\nPre-hospitalisation Expenses"
     },
     {
-        "clause_id": "4.1",
-        "text": "Clause 4.1\nCustomer claim records must be retained for 7 years."
+        "faiss_id": 13,
+        "clause_id": "4",
+        "parent_id": null,
+        "text": "4. - Insurer shall pay for expenses as\ndefined in the policy and incurred 30 days prior to the date of\nadmission into the hospital or Domiciliary Hospitalisation\nPost-hospitalisation Expenses"
     },
     {
-        "clause_id": "4.2",
-        "text": "Clause 4.2\nPersonally identifiable information shall be encrypted at rest."
+        "faiss_id": 14,
+        "clause_id": "5",
+        "parent_id": null,
+        "text": "5. - Insurer shall pay for expenses as\ndefined in the policy and incurred 60 days after the date of\ndischarge from the hospital or Domiciliary Hospitalisation\nDay Care Expenses"
     },
     {
-        "clause_id": "4.3",
-        "text": "Clause 4.3\nAudit logs must be immutable."
+        "faiss_id": 15,
+        "clause_id": "6",
+        "parent_id": null,
+        "text": "6. - Insurer shall pay for Day Care expenses\nincurred on advanced technological surgeries and procedures\nrequiring less than 24 hours of hospitalisation as per the attached\nlist and subject to the condition that prior approval is obtained by\nthe Insured Person/Insured from the Administrator/Insurer for\nsuch a Day Care Procedure/Expense.\nNon Network Hospitalisation Co-pay"
     },
     {
-        "clause_id": "4.4",
-        "text": "Clause 4.4\nEvery automated fraud decision must be explainable and reproducible."
+        "faiss_id": 16,
+        "clause_id": "7",
+        "parent_id": null,
+        "text": "7. - For all admissible claims\nwhere treatment is taken at hospitals which are not in the list of\nnetwork providers empanelled by the Company/Administrator,\ninsured person shall bear 10% of the eligible admissible claim as\nper terms of insurance or shall bear a % of the eligible admissible\nclaim as stipulated in the schedule for the said purpose.\nDomiciliary Hospitalisation"
+    },
+    {
+        "faiss_id": 17,
+        "clause_id": "8",
+        "parent_id": null,
+        "text": "8. - Insurer will cover Reasonable and\nCustomary Charges towards Domiciliary Hospitalisation exceeding\n3 days as defined in definition subject to 20% of the Basic Sum\nInsured or a maximum of up to Rs.20000, whichever is lesser,\nhowever domiciliary Hospitalisation benefits shall not cover:-\ni. Expenses incurred for pre and post domiciliary hospitalisation\ntreatment or\nii. Expenses incurred for treatment for any of the following\nDiseases\na. Asthma\nb. Bronchitis\nc. Chronic Nephritis and Nephritic Syndrome\nd. Diarrhea and all type of Dysenteries including Gastro-\nenteritis\ne. Epilepsy\nf. Influenza, Cough and Cold\ng. Pyrexia of unknown Origin for less than 10 days\nh. Tonsillitis and Upper Respiratory Tract Infection including\nLaryngitis and Pharingitis\ni. Arthritis, Gout and Rheumatism\nHIV/AIDS Cover:"
+    },
+    {
+        "faiss_id": 18,
+        "clause_id": "9",
+        "parent_id": null,
+        "text": "9. We will cover expenses incurred for Inpatient\nhuman immunodeficiency virus or variant/mutant viruses and or\nany syndrome or condition of a similar kind commonly referred to\nas AIDS upto the Sum Insured or as specified in the policy\nschedule except for the conditions which are permanently\nexcluded\n10.Mental Illness Cover: We will cover for the expenses incurred for\nthe inpatient Treatment for any mental illness or psychiatric or\npsychological ailment / condition upto the Sum Insured or as\nspecified on the policy schedule.\n11.Genetic Disorders or Diseases are covered up to the Sum Insured\nor as specified on the policy schedule.\n12.Internal Congenital Diseases are Covered upto the Sum Insured or\nas specified on the policy schedule.\n13.The following procedures will be covered (wherever medically\nindicated) either as in patient or as part of day care treatment in a\nhospital up to of Sum Insured or as specified in the policy\nschedule, during the policy period but not limited to the following:\nA. Uterine Artery Embolization and HIFU (High Intensity\nFocused Ultrasound)\nB. Balloon Sinuplasty\nC. Deep Brain Stimulation\nD. Oral Chemotherapy\nE. Immunotherapy - Monoclonal Antibody to be given as\ninjection\nF. Intra Vitreal Injections\nG. Robotic Surgeries\nH. Stereotactic Radio Surgeries\nI. Bronchial Thermoplasty\nJ. Vaporisation of the Prostrate ( Green Laser Treatment or\nHolmium Laser Treatment)\nK. IONM - (lntra Operative Neuro Monitoring)\nL. Stem Cell Therapy: Hematopoietic stem cells for bone\nmarrow transplant for haematological conditions to be\ncovered\nEXCLUSIONS\nWe will not pay for any expenses incurred by Insured Person in respect\nof claims arising out of or howsoever related to any of the following\nand for any of the coverages offered under the policy including add on\ncovers:"
+    },
+    {
+        "faiss_id": 19,
+        "clause_id": "1",
+        "parent_id": null,
+        "text": "1. Pre-Existing Diseases - Code- Excl01\na) Expenses related to the treatment of a pre-existing Disease\n(PED) and its direct complications shall be excluded until the\nexpiry of 36 months of continuous coverage after the date of\ninception of the first policy with insurer.\nb) In case of enhancement of sum insured the exclusion shall\napply afresh to the extent of sum insured increase.\nc) If the Insured Person is continuously covered without any\nbreak as defined under the portability norms of the extant\nIRDAI (Health Insurance) Regulations, then waiting period for\nthe same would be reduced to the extent of prior coverage.\nd) Coverage under the policy after the expiry of 36 months for\nany pre-existing disease is subject to the same being declared\nat the time of application and accepted by Insurer."
+    },
+    {
+        "faiss_id": 20,
+        "clause_id": "2",
+        "parent_id": null,
+        "text": "2. Specified disease/procedure waiting period- Code- Excl02\na) Expenses related to the treatment of the listed Conditions,\nPAGE 6\nDays/ 12 months of continuous coverage after the date of\ninception of the first policy with us. This exclusion shall not be\napplicable for claims arising due to an accident.\nb) In case of enhancement of sum insured the exclusion shall\napply afresh to the extent of sum insured increase.\nc) If any of the specified disease/procedure falls under the\nwaiting period specified for pre-Existing diseases, then the\nlonger of the two waiting periods shall apply.\nd) The waiting period for listed conditions shall apply even if\ncontracted after the policy or declared and accepted without a\nspecific exclusion.\ne) If the Insured Person is continuously covered without any\nbreak as defined under the applicable norms on portability\nstipulated by IRDAI, then waiting period for the same would be\nreduced to the extent of prior coverage.\nf) List of specific diseases/procedures\n12 Months Waiting Period:\ni. Any types of gastric or duodenal ulcers;\nii. Tonsillectomy, Adenoidectomy, Mastoidectomy,\nTympanoplasty;\niii. Surgery on all internal or external tumor /cysts/nodules/\npolyps of any kind including breast lumps;\niv. All types of Hernia and Hydrocele;\nv. Anal Fissures, Fistula and Piles;\nvi. Cataract;\nvii. Benign Prostatic Hypertrophy;\nviii. Hysterectomy/ myomectomy for menorrhagia or\nfibromyoma or prolapse of uterus;\nix. Non infective Arthritis, Treatment of Spondylosis /\nSpondylitis, Gout & Rheumatism;\nx. Surgery of Genitourinary tract;\nxi. Calculus Diseases;\nxii. Sinusitis, nasal disorders and related disorders;\nxiii. Surgery for prolapsed intervertebral disc unless arising\nfrom accident;\nxiv. Vertebro-spinal disorders (including disc) and knee\nconditions;\nxv. Surgery of varicose veins and varicose ulcers;\nxvi. Chronic Renal failure;\nxvii.Medical Expenses incurred in connection with joint\nreplacement surgery due to Degenerative condition, Age\nrelated osteoarthritis and Osteoporosis unless such\nJoint replacement surgery unless necessitated by\nAccidental Bodily Injury.\n90 Days Waiting Period:\ni. Hypertension, Heart Disease and related complications;\nii. Diabetes and related complications;"
+    },
+    {
+        "faiss_id": 21,
+        "clause_id": "3",
+        "parent_id": null,
+        "text": "3. 30-day waiting period- Code- Excl03\na) Expenses related to the treatment of any illness within 30\ndays from the first policy commencement date shall be\nexcluded except claims arising due to an accident, provided\nthe same are covered.\nb) This exclusion shall not, however, apply if the Insured Person\nhas Continuous Coverage for more than twelve months.\nc) The within referred waiting period is made applicable to the\nenhanced sum insured in the event of granting higher sum\ninsured subsequently."
+    },
+    {
+        "faiss_id": 22,
+        "clause_id": "4",
+        "parent_id": null,
+        "text": "4. Treatment outside India."
+    },
+    {
+        "faiss_id": 23,
+        "clause_id": "5",
+        "parent_id": null,
+        "text": "5. War, invasion, acts of foreign enemies, hostilities (whether war be\ndeclared or not), civil war, commotion, unrest, rebellion,\nrevolution, insurrection, military or usurped power or\nconfiscation or nationalisation or requisition of or damage by or\nunder the order of any government or public local authority."
+    },
+    {
+        "faiss_id": 24,
+        "clause_id": "6",
+        "parent_id": null,
+        "text": "6. Injury or Disease directly or indirectly caused by or contributed to\nby nuclear weapons/materials."
+    },
+    {
+        "faiss_id": 25,
+        "clause_id": "7",
+        "parent_id": null,
+        "text": "7. Circumcision unless necessary for treatment of a disease, illness\nor injury not excluded hereunder, or, as may be necessitated due\nto an accident"
+    },
+    {
+        "faiss_id": 26,
+        "clause_id": "8",
+        "parent_id": null,
+        "text": "8. Refractive Error: (Code- Excl15)\nExpenses related to the treatment for correction of eye sight due\nto refractive error less than 7.5 dioptres."
+    },
+    {
+        "faiss_id": 27,
+        "clause_id": "9",
+        "parent_id": null,
+        "text": "9. Cosmetic or plastic Surgery: (Code- Excl08)\nExpenses for cosmetic or plastic surgery or any treatment to\nchange appearance unless for reconstruction following an\nAccident, Burn(s) or Cancer or as part of medically necessary\ntreatment to remove a direct and immediate health risk to the\ninsured. For this to be considered a medical necessity, it must be\ncertified by the attending Medical Practitioner."
+    },
+    {
+        "faiss_id": 28,
+        "clause_id": "10",
+        "parent_id": null,
+        "text": "10. The cost of spectacles, contact lenses, hearing aids, crutches,\nwheelchairs, dentures, artificial teeth and all other external\nappliances, and/or devices unless specifically covered."
+    },
+    {
+        "faiss_id": 29,
+        "clause_id": "11",
+        "parent_id": null,
+        "text": "11. Expenses incurred on Items for personal comfort like television,\ntelephone, etc. incurred during hospitalization and which have\nbeen specifically charged for in the hospitalisation bills issued by\nthe hospital."
+    },
+    {
+        "faiss_id": 30,
+        "clause_id": "12",
+        "parent_id": null,
+        "text": "12. External medical equipment of any kind used at home as post\nhospitalisation care including cost of instrument used in the\ntreatment of Sleep Apnoea Syndrome (C.P.A.P), Continuous\nPeritoneal Ambulatory Dialysis (C.P.A.D) and Oxygen concentrator\nfor Bronchial Asthmatic condition."
+    },
+    {
+        "faiss_id": 31,
+        "clause_id": "13",
+        "parent_id": null,
+        "text": "13. Dental treatment or surgery of any kind unless required as a result\nof Accidental Bodily Injury to natural teeth requiring\nhospitalization treatment."
+    },
+    {
+        "faiss_id": 32,
+        "clause_id": "14",
+        "parent_id": null,
+        "text": "14. Convalescence, general debility, “Run-down” condition, rest cure,\nCongenital external illness/ disease/ defect."
+    },
+    {
+        "faiss_id": 33,
+        "clause_id": "15",
+        "parent_id": null,
+        "text": "15. Intentional self-injury (including but not limited to the use or\nmisuse of any intoxicating drugs or alcohol)."
+    },
+    {
+        "faiss_id": 34,
+        "clause_id": "16",
+        "parent_id": null,
+        "text": "16. Breach of law: (Code- Excl10)\nExpenses for treatment directly arising from or consequent upon\nany Insured Person committing or attempting to commit a breach\nof law with criminal intent."
+    },
+    {
+        "faiss_id": 35,
+        "clause_id": "17",
+        "parent_id": null,
+        "text": "17. Treatment for, Alcoholism, drug or substance abuse or any\n(Code- Excl12)\naddictive condition and consequences thereof."
+    },
+    {
+        "faiss_id": 36,
+        "clause_id": "18",
+        "parent_id": null,
+        "text": "18. Venereal disease or any sexually transmitted disease or sickness.\n(excluding HIV / AIDS as mentioned under scope of cover )"
+    },
+    {
+        "faiss_id": 37,
+        "clause_id": "19",
+        "parent_id": null,
+        "text": "19. Maternity Expenses (Code - Excl 18):\ni. Medical treatment expenses traceable to childbirth (including\ncomplicated deliveries and caesarean sections incurred\nduring hospitalization) except ectopic pregnancy;\nii. expenses towards miscarriage (unless due to an accident) and\nlawful medical termination of pregnancy during the policy\nperiod.\nPAGE 7"
+    },
+    {
+        "faiss_id": 38,
+        "clause_id": "20",
+        "parent_id": null,
+        "text": "20. Sterility and Infertility: (Code- Excl17)\nExpenses related to sterility and infertility this includes:\ni. Any type of sterilization\nii. Assisted Reproduction services including artificial\ninsemination and advanced reproductive technologies such\nas IVF, ZIFT, GIFT ICSI\niii. Gestational Surrogacy\niv. Reversal of sterilization"
+    },
+    {
+        "faiss_id": 39,
+        "clause_id": "21",
+        "parent_id": null,
+        "text": "21. Vaccination or inoculation except as part of post-bite treatment\nfor animal bite."
+    },
+    {
+        "faiss_id": 40,
+        "clause_id": "22",
+        "parent_id": null,
+        "text": "22. Dietary supplements and substances that can be purchased\nwithout prescription, including but not limited to Vitamins,\nminerals and organic substances unless prescribed by a medical\npractitioner as part of hospitalization claim or day care\n(Code- Excl14)\nprocedure."
+    },
+    {
+        "faiss_id": 41,
+        "clause_id": "23",
+        "parent_id": null,
+        "text": "23. Surgery to correct Deviated Nasal septum and hypertrophied\nturbinate unless necessitated by an accidental body injury and\nproved to our satisfaction that the condition is a result of an\naccidental injury."
+    },
+    {
+        "faiss_id": 42,
+        "clause_id": "24",
+        "parent_id": null,
+        "text": "24. Medical Practitioner’s home visit Expenses during pre and post\nhospitalization period, Attendant Nursing Expenses."
+    },
+    {
+        "faiss_id": 43,
+        "clause_id": "25",
+        "parent_id": null,
+        "text": "25. Outpatient Diagnostic, Medical and Surgical procedures or\ntreatments, non-prescribed drugs and medical supplies,\n(Code- Excl 07)"
+    },
+    {
+        "faiss_id": 44,
+        "clause_id": "26",
+        "parent_id": null,
+        "text": "26. Change of Gender Treatments\nExpenses related to any treatment, including surgical\nmanagement, to change characteristics of the body to those of\nthe opposite sex. However, such exclusion shall not be applicable\nto respective Insured Person to comply with Transgender\nPersons (Protection of Rights) Act, 2019."
+    },
+    {
+        "faiss_id": 45,
+        "clause_id": "27",
+        "parent_id": null,
+        "text": "27. Hazardous or Adventure sports: Code- Excl09\nExpenses related to any treatment necessitated due to\nparticipation as a professional in hazardous or adventure sports,\nincluding but not limited to, para-jumping, rock climbing,\nmountaineering rafting, motor racing, horse racing or scuba\ndiving, hand gliding, sky diving, deep-sea diving."
+    },
+    {
+        "faiss_id": 46,
+        "clause_id": "28",
+        "parent_id": null,
+        "text": "28. Expenses incurred at Hospital primarily for diagnosis irrespective\nof 24 hours hospitalization. This would also include stay in a\nhospital without undertaking any treatment or where there is no\nactive regular treatment by the Medical Practitioner, which\nordinarily can be given without hospitalization."
+    },
+    {
+        "faiss_id": 47,
+        "clause_id": "29",
+        "parent_id": null,
+        "text": "29. Treatments received in heath hydros, nature cure clinics, spas or\nsimilar establishments or private beds registered as a nursing\nhome attached to such establishments or where admission is\n(Code- Excl13)\narranged wholly or partly for domestic reasons.\n(Code- Excl05)"
+    },
+    {
+        "faiss_id": 48,
+        "clause_id": "30",
+        "parent_id": null,
+        "text": "30. Rest Cure, rehabilitation and respite care-\na) Expenses related to any admission primarily for enforced bed\nrest and not for receiving treatment. This also includes:\ni. Custodial care either at home or in a nursing facility for\npersonal care such as help with activities of daily living such\nas bathing, dressing, moving around either by skilled\nnurses or assistant or non-skilled persons.\nii. Any services for people who are terminally ill to address\nphysical, social, emotional and spiritual needs."
+    },
+    {
+        "faiss_id": 49,
+        "clause_id": "31",
+        "parent_id": null,
+        "text": "31. Investigation & Evaluation- (Code- Excl04)\na) Expenses related to any admission primarily for diagnostics\nand evaluation purposes only are excluded.\nb) Any diagnostic expenses which are not related or not"
+    },
+    {
+        "faiss_id": 50,
+        "clause_id": "32",
+        "parent_id": null,
+        "text": "32. Treatment with alternative medicines like ayurvedic,\nhomeopathy, unani, acupuncture, acupressure, osteopath,\nnaturopathy, chiropractic, reflexology and aromatherapy unless\nspecifically covered under the policy."
+    },
+    {
+        "faiss_id": 51,
+        "clause_id": "33",
+        "parent_id": null,
+        "text": "33. Hospitalization for donation of any body organs by an Insured\nPerson including complications arising from the donation of\norgans."
+    },
+    {
+        "faiss_id": 52,
+        "clause_id": "34",
+        "parent_id": null,
+        "text": "34. Obesity/ Weight Control: (Code- Excl06)\nExpenses related to the surgical treatment of obesity that does\nnot fulfil all the below conditions:"
+    },
+    {
+        "faiss_id": 53,
+        "clause_id": "1",
+        "parent_id": null,
+        "text": "1. Surgery to be conducted is upon the advice of the Doctor"
+    },
+    {
+        "faiss_id": 54,
+        "clause_id": "2",
+        "parent_id": null,
+        "text": "2. The surgery/Procedure conducted should be supported by\nclinical protocols"
+    },
+    {
+        "faiss_id": 55,
+        "clause_id": "3",
+        "parent_id": null,
+        "text": "3. The member has to be 18 years of age or older and"
+    },
+    {
+        "faiss_id": 56,
+        "clause_id": "4",
+        "parent_id": null,
+        "text": "4. Body Mass Index (BMI);\na) greater than or equal to 40 or\nb) greater than or equal to 35 in conjunction with any of the\nfollowing severe co- morbidities\nfollowing failure of less invasive methods of weight loss:\ni. Obesity-related cardiomyopathy\nii. Coronary heart disease\niii. Severe Sleep Apnea\niv. Uncontrolled Type2 Diabetes"
+    },
+    {
+        "faiss_id": 57,
+        "clause_id": "35",
+        "parent_id": null,
+        "text": "35. Unproven Treatments: Code- Excl16\nExpenses related to any unproven treatment, services and\nsupplies for or in connection with any treatment. Unproven\ntreatments are treatments, procedures or supplies that lack\nsignificant medical documentation to support their\neffectiveness."
+    },
+    {
+        "faiss_id": 58,
+        "clause_id": "36",
+        "parent_id": null,
+        "text": "36. Costs of donor screening or treatment including organ\nextraction, unless specifically covered and specified in the\nschedule of the policy."
+    },
+    {
+        "faiss_id": 59,
+        "clause_id": "37",
+        "parent_id": null,
+        "text": "37. Disease / injury illness whilst performing duties as a serving\nmember of a military or police force."
+    },
+    {
+        "faiss_id": 60,
+        "clause_id": "38",
+        "parent_id": null,
+        "text": "38. Any kind of Service charges, Surcharges, Admission fees /\nRegistration charges etc levied by the hospital."
+    },
+    {
+        "faiss_id": 61,
+        "clause_id": "39",
+        "parent_id": null,
+        "text": "39. In respect of the existing diseases, disclosed by the insured and\nmentioned in the policy schedule (based on insured's consent),\npolicyholder is not entitled to get the coverage for specified ICD\ncodes.\nCONDITIONS"
+    },
+    {
+        "faiss_id": 62,
+        "clause_id": "1",
+        "parent_id": null,
+        "text": "1. Condition Precedent to Admission of Liability\nThe terms and conditions of the policy must be fulfilled by the\ninsured person for the Company to make any payment for\nclaim(s) arising under the policy."
+    },
+    {
+        "faiss_id": 63,
+        "clause_id": "2",
+        "parent_id": null,
+        "text": "2. Disclosure to Information Norm:\nThe policy shall be void and all premium paid thereon shall be\nforfeited to the Company in the event of misrepresentation, mis\ndescription or non-disclosure ofany material fact by the\npolicyholder. (Explanation: \"Material facts\" for the purpose of this\npolicy shall mean all relevant information sought by the company\nin the proposal form and other connected documents to enable it\nto take informed decision in the context of underwriting the risk)"
+    },
+    {
+        "faiss_id": 64,
+        "clause_id": "3",
+        "parent_id": null,
+        "text": "3. Complete Discharge\nAny payment to the policyholder, insured person or his/ her\nPAGE 8\nHospital, as the case may be, for any benefit under the policy shall\nbe a valid discharge towards payment of claim by the Company to\nthe extent of that amount for the particular claim."
+    },
+    {
+        "faiss_id": 65,
+        "clause_id": "4",
+        "parent_id": null,
+        "text": "4. Due Care\nWhere this Policy requires Insured to do or not to do something,\nthen the complete satisfaction of that requirement by Insured or\nsomeone claiming on Insured behalf is a precondition to any\nobligation under this Policy. If Insured or someone claiming on\nInsured behalf fails to completely satisfy that requirement, then\nInsurer may refuse to consider Insured claim. Insured will\ncooperate with Insurer at all times."
+    },
+    {
+        "faiss_id": 66,
+        "clause_id": "5",
+        "parent_id": null,
+        "text": "5. Free look period\n(1) Every Policyholder of new individual health insurance policies\nexcept those with tenure of less than a year, shall be provided a\nfree look period of 30 days beginning from the date of receipt\nof policy document, whether received electronically or\notherwise, to review the terms and conditions of such Policy.\n(2) In the event a Policyholder disagrees to any of the Policy terms\nor conditions, or otherwise and has not made any claim, he\nshall have the option to return the Policy to the insurer for\ncancellation, stating the reasons for the same.\n(3) Irrespective of the reasons mentioned, the Policyholder shall\nbe entitled to a refund of the premium paid subject only to a\ndeduction of a proportionate risk premium for the period of\ncover and the expenses, if any, incurred by the insurer on\nmedical examination of the proposer and stamp duty charges.\n(4) A request received by insurer for cancellation of the Policy\nduring free look period shall be processed and premium shall\nbe refunded within 7 days of receipt of such request, as stated\nat sub regulation (3) above."
+    },
+    {
+        "faiss_id": 67,
+        "clause_id": "6",
+        "parent_id": null,
+        "text": "6. Mis-description\nThis Policy shall be void and premium paid shall be forfeited to\nInsurer in the event of misrepresentation, mis-description or\nnon-disclosure of any materials facts pertaining to the proposal\nform, written declarations or any other communication\nexchanged for the sake of obtaining the Insurance policy by the\nInsured. Nondisclosure shall include non-intimation of any\ncircumstances which may affect the insurance cover granted.\nThe Misrepresentation, mis-description and non-disclosure is\nrelated to the information provided by the proposer/insured to\nthe Insurer at any point of time starting from seeking the\ninsurance cover in the form of submitting the filled in proposal\nform, written declarations or any other communication\nexchanged for the sake of obtaining the Insurance policy and\nends only after all the Contractual obligations under the policy\nare exhausted for both the parties under the contract."
+    },
+    {
+        "faiss_id": 68,
+        "clause_id": "7",
+        "parent_id": null,
+        "text": "7. Insured Person\nOnly those persons named as the Insured Person in the Schedule\nshall be covered under this Policy. The details of the Insured\nPerson are as provided by Insured. A person may be added as an\nInsured Person during the Policy Period after Insured’s Proposal\nhas been accepted by Insurer, an additional premium has been\npaid and Insurer’s agreement to extend cover has been indicated\nby it issuing an endorsement confirming the addition of such\nperson as an Insured. Cover under this Policy shall be withdrawn\nfrom any Insured Person upon such Insured giving 15 days written\nnotice to be received by Insurer."
+    },
+    {
+        "faiss_id": 69,
+        "clause_id": "8",
+        "parent_id": null,
+        "text": "8. Premium\nThe premium payable under this policy shall be paid in advance.\nNo receipt for premium shall be valid except on the official form of\nInsurer signed by a duly authorized official of Insurer. The due\nterms, provisions, conditions and endorsements of this policy by\nthe Insured person in so far as they relate to anything to be done\nor complied with by the Insured Person shall be a condition\nprecedent to any liability of Insurer to make any payment under\nthis policy. No waiver of any terms provisions, conditions and\nendorsements of this policy shall be valid unless made in writing\nand signed by an authorized official of Insurer."
+    },
+    {
+        "faiss_id": 70,
+        "clause_id": "9",
+        "parent_id": null,
+        "text": "9. Package Service Expenses\nas defined under the policy will be\npayable only if prior approval for the said package service is\nprovided by Administrator / Insurer upon the request of the\nInsured Person or Insured."
+    },
+    {
+        "faiss_id": 71,
+        "clause_id": "10",
+        "parent_id": null,
+        "text": "10. Mechanism for continuity of coverage for Individual members\ncovered under the group insurance:\nIn the event of the group policy under which the Insured Person is\na covered member and which is being discontinued or not\nrenewed or Insured person leaving the group on account of\nresignation/termination or otherwise, the Insured Person has\nthe option of taking a standard individual health policy of the\nInsurer without any benefit of continuity of cover for any\nadditional benefits that the Insured Person may have enjoyed\nunder the group policy and for which additional premium has\nbeen charged. In such an event, all the waiting periods as\nstipulated under the Individual Health policy will be applicable\nwith due adjustment for the Uninterrupted period in completed\nyears for which the Individual was covered under the Group\nHealth policy issued by us. However, any such benefit would be\nrestricted to the maximum of his eligibility of sum insured under\nthe Individual health policy or the sum insured enjoyed by the\nindividual under the Group Health policy whichever is lower. Also,\nall the underwriting rules and regulations of our Individual health\npolicy would be applicable for acceptance of such risk."
+    },
+    {
+        "faiss_id": 72,
+        "clause_id": "11",
+        "parent_id": null,
+        "text": "11. Unhindered access\nThe Insured/Insured person shall extend all possible support &\nco-operation including necessary authorisation to the insurer for\naccessing the medical records and medical practitioners who\nhave attended to the patient."
+    },
+    {
+        "faiss_id": 73,
+        "clause_id": "12",
+        "parent_id": null,
+        "text": "12. Claims Procedures\nI. Reimbursement:\na. The Insured Person shall without any delay consult a Doctor\nand follow the advice and treatment recommended, take\nreasonable steps to minimize the quantum of any claim that\nmight be made under this Policy and intimation to this effect\ncan be forwarded to insurer accordingly.\nb. In respect of post hospitalization claims, the claims must be\nlodged within 15 days from the completion of post\nhospitalisation treatment subject to maximum of 75 days\nfrom the date of discharge from hospital.\nc. The Insured Person shall submit himself for examination by\nInsurer’s medical advisors as often as may be considered\nnecessary by Insurer. In such an event the Insurer will bear all\nexpenses incurred with the prior approval/permission of the\nInsurer to the Insured Person for making himself available for\nthe said examinations.\nd. Insured / Insured person shall submit all original bills, receipts,\ncertificates, information and evidences from the attending\nMedical Practitioner / Hospital / Diagnostic Laboratory as\nrequired by Insurer.\ne. On receipt of intimation from Insured / Insured Person\nregarding a claim under the policy, Insurer / Administrator is\nentitled to carry out examination and obtain information on\nany alleged Injury or Disease requiring Hospitalisation of the\nPAGE 9\nii. Cashless:\nADMINISTRATOR will provide the User guide & identity card to\ninsured. User guide will have following details:\na. Contact details of all Administrator offices\nb. Website address of Administrator\nc. List of network providers with their contact details\nd. Procedure for availing cashless benefits at Network providers\ne. Claim submission guidelines.\niii. Intimation of claims:\na. In the event of Accidental Bodily Injury or Disease / Illness first\noccurring or manifesting itself during the Policy Period and\ncausing the Insured Person’s Hospitalisation, a\nhospitalization benefit will be payable as per the Policy\nconditions, that may result in a claim as per Policy terms and\ncondition, then as a condition precedent to Insurer’s liability,\nInsured / Insured person must provide intimation to Insurer\nimmediately and in any event within 48 hours from date of\nhospitalisation. However, the Insurer at his sole discretion\nmay relax this condition subject to a satisfactory proof/\nevidence/justification being produced on the reasons for\nsuch a delay beyond the stipulated period. The intimation can\nbe sent by Insured / Insured Person through various modes\nlike email / telephone/ fax/ in person / letter or any other\nsuitable mode.\nb. Insured/Insured Person will need to submit the below\nmentioned documents for the processing of Hospitalisation\nClaims within 30 days from the date of discharge from the\nHospital, however the Insurer at his sole discretion may relax\nthis condition subject to a satisfactory proof/evidence being\nproduced on the reasons for such a delay beyond the\nstipulated 30 days up to a maximum period of 60 days.\niv. Claims Submission:\nInsured / Insured Person will submit the claim documents to the\nAdministrator . Following is the document list for claim\nsubmission:\na. Duly filled Claim form,\nb. Valid Photo Identity Card\nc. Original Discharge card/certificate/ death summary\nd. Copies of prescription for diagnostic test, treatment advise,\nmedical references\ne. Original set of investigation reports\nf. Itemized original hospital bills, original receipts and related\noriginal medical expenses receipts, pharmacy bills in original\nwith prescriptions.\nv. Claims Processing:\nOn receipt of claim documents from Insured/Insured Person,\nInsurer/Administrator shall assess the admissibility of claim as\nper Policy terms and conditions. Upon satisfactory completion of\nassessment and admission of claim, the Insurer will make the\npayment of benefit as per the contract. In case if the claim is\nrepudiated Insurer will inform the claimant about the same in\nwriting with reason for repudiation.\nvi. Penal Interest Provision :\n1) The Company shall settle or reject a claim, as the case may be,\nwithin 30 days from the date of receipt of last necessary\ndocument.\n2) ln the case of delay in the payment of a claim, the Company\nof receipt of last necessary document to the date of payment\nof claim at a rate 2o/o above the bank rate.\n3) However, where the circumstances of a claim warrant an\ninvestigation in the opinion of the Company, it shall initiate\nand complete such investigation at the earliest, in any case\nnot later than 30 days from the date of receipt of last\nnecessary document- ln such cases, the Company shall settle\nor reject the claim within 45 days from the date of receipt of\nlast necessary document.\n4) ln case of delay beyond stipulated 45 days, the Company shall\nbe liable to pay interest to the policyholder at a rate 2o/o\nabove the bank rate from the date of oreceipt of last\nnecessary document to the date of payment of claim.\n(Explanation: Bank Rate means Bank rate fixed by the Reserve\nBank of India (RBI) which is prevalent as on 1st day of the\nfinancial year in which the claim has fallen due)"
+    },
+    {
+        "faiss_id": 74,
+        "clause_id": "13",
+        "parent_id": null,
+        "text": "13. Fraud\nlf any claim made by the insured person, is in any respect\nfraudulent, or if any false statement, or declaration is made or\nused in support thereof, or if any fraudulent means or devices are\nused by the insured person or anyone acting on his/her behalf to\nobtain any benefit under this policy, all benefits under this policy\nand the premium paid shall be forfeited.\nAny amount already paid against claims made under this policy but\nwhich are found fraudulent later shall be repaid by all recipient(s)/\npolicyholder(s), who has made that particular claim, who shall be\njointly and severally liable for such repayment to the insurer.\nFor the purpose of this clause, the expression \"fraud\" means any\nof the following acts committed by the insured person or by his\nagent or the hospital/doctor/any other pa(y acting on behalf of\nthe insured person, with intent to deceive the insurer or to induce\nthe insurer to issue an insurance policy:\na) the suggestion, as a fact of that which is not true and which\nthe insured person does not believe to be true;\nb) the active concealment of a fact by the insured person having\nknowledgeor belief of the fact;\nc) any other act fitted to deceive; and\nd) any such act or omission as the law specially declares to be\nfraudulent\nThe Company shall not repudiate the claim and / or forfeit the\npolicy benefits on the ground of Fraud, if the insured person /\nbeneficiary can prove that the misstatement was true to the best\nof his knowledge and there was no deliberate intention to\nsuppress the fact or that such misstatement of or suppression of\nmaterial fact are within the knowledge of the insurer."
+    },
+    {
+        "faiss_id": 75,
+        "clause_id": "14",
+        "parent_id": null,
+        "text": "14. Nomination:\nThe policyholder is required at the inception of the policy to make\na nomination for the purpose of payment of claims under the\npolicy in the event of death of the policyholder. Any change of\nnomination shall be communicated to the company in writing and\nsuch change shall be effective only when an endorsement on the\npolicy is made. ln the event of death of the policyholder, the\nCompany will pay the nominee {as named in the Policy\nSchedule/Policy Certificate/Endorsement (if any)} and in case\nthere is no subsisting nominee, to the legal heirs or legal\nrepresentatives of the policyholder whose discharge shall be\ntreated as full and final discharge of its liability under the policy."
+    },
+    {
+        "faiss_id": 76,
+        "clause_id": "15",
+        "parent_id": null,
+        "text": "15. Multiple Policies\na. Indemnity Policies:\nPAGE 10\nchoice under any Policy. The Insurer of that chosen Policy shall\nbe treated as the primary Insurer.\nIn case the available coverage under the said Policy is less than\nthe admissible Claim amount, the primary Insurer shall seek\nthe details of other available policies of the Policyholder and\nshall coordinate with other Insurers to ensure settlement of\nthe balance amount as per the Policy conditions, without\ncausing any hassles to the Policyholder.\nb. Benefit based Policies:\nOn occurrence of the Insured event, the Policyholders can\nClaim from all Insurers under all policies."
+    },
+    {
+        "faiss_id": 77,
+        "clause_id": "16",
+        "parent_id": null,
+        "text": "16. Cancellation\nThe Policyholder may cancel his/her Policy at any time during the\nterm, by giving 7 days’ notice in writing. The Insurer shall\ni. refund proportionate premium for unexpired Policy Period, if\nthe term of Policy upto one year and there is no Claim (s) made\nduring the Policy Period.\nii. refund premium for the unexpired Policy Period, in respect of\npolicies with term more than 1 year and risk coverage for such\nPolicy years has not commenced.\niii. The Company may cancel the policy at any time on grounds of\nmisrepresentation non-disclosure of material facts, fraud by\nthe insured person by giving 15 days' written notice. There\nwould be no refund of premium on cancellation on grounds or\nmisrepresentation, non-disclosure of material facts or fraud."
+    },
+    {
+        "faiss_id": 78,
+        "clause_id": "17",
+        "parent_id": null,
+        "text": "17. Termination of Policy\nThis Policy terminates on earliest of the following events-\na. Cancellation of policy by as per the cancellation provision.\nb. On the policy expiry date."
+    },
+    {
+        "faiss_id": 79,
+        "clause_id": "18",
+        "parent_id": null,
+        "text": "18. Arbitration & Conciliation\ni. If any dispute or difference shall arise as to the quantum to be\npaid under this Policy ( liability being otherwise admitted) such\ndifference shall independently of all other questions be\nreferred to the decision of a sole Arbitrator to be appointed in\nwriting by the parties to the dispute/difference, or if they\ncannot agree upon a single Arbitrator within 30 days of any\nparty invoking arbitration, the same shall be referred to a\npanel of 3 Arbitrators, comprising of two Arbitrators and one\nto be appointed by each of the parties to the dispute/\ndifference and the third Arbitrator to be appointed by such\ntwo Arbitrators and the arbitration shall be conducted under\nand in accordance with the provisions of the Arbitration and\nConciliations Act 1996.\nii. It is hereby agreed and understood that no dispute or\ndifference shall be referable to arbitration, as hereinbefore\nprovided, if the Insurer has disputed or not accepted liability\nunder or in respect of this Policy.\niii. It is expressly stipulated and declared that it shall be a\ncondition precedent to any right of action or suit upon this\nPolicy that the award by such Arbitrator/Arbitrators of the\namount of the loss shall be first obtained.\niv. The law of the arbitration shall be Indian law and the seat of the\narbitration and venue for all the hearings shall be within India."
+    },
+    {
+        "faiss_id": 80,
+        "clause_id": "19",
+        "parent_id": null,
+        "text": "19. Renewal\ni. The Policy shall ordinarily be renewable provided the product\nis not withdrawn, except on grounds of established fraud or\nnon-disclosure or misrepresentation by the Insured Person.\nii. The Company shall endeavor to give notice for Renewal.\nHowever, the Company is not under obligation to give any\niii. Renewal shall not be denied on the ground that the Insured\nPerson had made a Claim or Claims in the preceding Policy years.\niv. Request for Renewal along with the requisite premium shall be\nreceived by the Company before the end of the Policy Period\nv. At the end of the Policy Period, the Policy shall terminate and\ncan be renewed within the Grace Period of 30 days to maintain\ncontinuity of benefits without Break in Policy. Coverage is not\navailable during the Grace Period.\nvi. No loading shall apply on Renewals based on individual Claims\nexperience."
+    },
+    {
+        "faiss_id": 81,
+        "clause_id": "20",
+        "parent_id": null,
+        "text": "20. Withdrawal of Product\ni. ln the likelihood of this product being withdrawn in future, the\nCompany will intimate the insured person about the same 90\ndays prior to expiry of the policy.\nii. Insured Person will have the option to migrate to similar health\ninsurance product available with the Company at the time of\nrenewal with all the accrued continuity benefits such as\ncumulative bonus, waiver of waiting period. as per IRDAI\nguidelines, provided the policy has been maintained without a\nbreak."
+    },
+    {
+        "faiss_id": 82,
+        "clause_id": "21",
+        "parent_id": null,
+        "text": "21. Migration\nThe Insured Person will have the option to migrate the Policy to\nother health insurance products/plans offered by the Company\nby applying for Migration of the Policy at least 30 days before the\nPolicy Renewal date as per lRDAl guidelines on Migration. If such\nperson is presently covered and has been continuously covered\nwithout any lapses under any health insurance product/plan\noffered by the Company, the Insured Person is entitled to transfer\nthe credits gained to the extent of the Sum Insured, No Claim\nBonus, Specific Waiting Periods, Waiting Period for Pre-existing\nDiseases, Moratorium Period etc. in the previous Policy to the\nMigrated Policy.\nFor Detailed Guidelines on Migration, kindly refer the link-\nhttps://content.sbigeneral.in//uploads/c6a2844dd65446019b1\n30ffbae1fa20f.pdf"
+    },
+    {
+        "faiss_id": 83,
+        "clause_id": "22",
+        "parent_id": null,
+        "text": "22. Portability:\nThe Insured Person will have the option to port the Policy to other\nInsurers by applying to such Insurer to port the entire Policy along\nwith all the members of the Family, if any, at least 45 days before,\nbut not earlier than 60 days from the Policy Renewal date as per\nlRDAl guidelines related to Portability. If such person is presently\ncovered and has been continuously covered without any lapses\nunder any health insurance Policy with an Indian General/Health\nInsurer, the proposed Insured Person is entitled to transfer the\ncredits gained to the extent of the Sum Insured, No Claim Bonus,\nSpecific Waiting Periods, Waiting Period for Pre-existing\nDiseases, Moratorium Period, etc. from the existing Insurer to the\nacquiring Insurer in the previous Policy. For Detailed Guidelines\non Portability, kindly refer the link-\nhttps://content.sbigeneral.in//uploads/c6a2844dd65446019b1\n30ffbae1fa20f.pdf"
+    },
+    {
+        "faiss_id": 84,
+        "clause_id": "23",
+        "parent_id": null,
+        "text": "23. Moratorium Period\nAfter completion of sixty continuous months of coverage\n(including portability and migration) in health insurance Policy, no\nPolicy and claim shall be contestable by the Insurer on grounds of\nnon-disclosure, misrepresentation, except on grounds of\nestablished fraud. This period of sixty continuous months is\ncalled as moratorium period. The moratorium would be\napplicable for the Sums Insured of the first Policy. Wherever, the\nSum Insured is enhanced, completion of sixty continuous months\nwould be applicable from the date of enhancement of Sums\nPAGE 11"
+    },
+    {
+        "faiss_id": 85,
+        "clause_id": "25",
+        "parent_id": null,
+        "text": "25. Possibility of Revision of Terms of the Policy lncluding the\nPremium Rates\nThe Company, with prior approval of lRDAl, may revise or modify\nthe terms of the policy including the premium rates. The insured\nperson shall be notified three months before the changes are\neffected."
+    },
+    {
+        "faiss_id": 86,
+        "clause_id": "26",
+        "parent_id": null,
+        "text": "26. Disclaimer\nIf Insurer shall disclaim liability to the Insured for any claim\nhereunder and if the Insured shall not within 12 calendar months\nfrom the date of receipt of the notice of such disclaimer notify\nInsurer in writing that he does not accept such disclaimer and\nintends to recover his claim from Insurer then the claim shall for all\npurposes be deemed to have been abandoned and shall not\nthereafter be recoverable hereunder."
+    },
+    {
+        "faiss_id": 87,
+        "clause_id": "27",
+        "parent_id": null,
+        "text": "27. Geographical limits\nAll medical/ surgical treatments under this policy shall have to be\ntaken in India and admissible claims thereof shall be payable in\nIndian currency."
+    },
+    {
+        "faiss_id": 88,
+        "clause_id": "1",
+        "parent_id": null,
+        "text": "1. Stapedectomy"
+    },
+    {
+        "faiss_id": 89,
+        "clause_id": "2",
+        "parent_id": null,
+        "text": "2. Revision of a stapedectomy"
+    },
+    {
+        "faiss_id": 90,
+        "clause_id": "3",
+        "parent_id": null,
+        "text": "3. Other operations on the auditory ossicles"
+    },
+    {
+        "faiss_id": 91,
+        "clause_id": "4",
+        "parent_id": null,
+        "text": "4. Myringoplasty (Type -I Tympanoplasty)"
+    },
+    {
+        "faiss_id": 92,
+        "clause_id": "5",
+        "parent_id": null,
+        "text": "5. Tympanoplasty (closure of an eardrum perforation/\nreconstruction of the auditory ossicles)"
+    },
+    {
+        "faiss_id": 93,
+        "clause_id": "6",
+        "parent_id": null,
+        "text": "6. Revision of a tympanoplasty"
+    },
+    {
+        "faiss_id": 94,
+        "clause_id": "7",
+        "parent_id": null,
+        "text": "7. Other microsurgical operations on the middle ear\nOther operations on the middle & internal ear"
+    },
+    {
+        "faiss_id": 95,
+        "clause_id": "8",
+        "parent_id": null,
+        "text": "8. Myringotomy"
+    },
+    {
+        "faiss_id": 96,
+        "clause_id": "9",
+        "parent_id": null,
+        "text": "9. Removal of a tympanic drain"
+    },
+    {
+        "faiss_id": 97,
+        "clause_id": "10",
+        "parent_id": null,
+        "text": "10. Incision of the mastoid process and middle ear"
+    },
+    {
+        "faiss_id": 98,
+        "clause_id": "11",
+        "parent_id": null,
+        "text": "11. Mastoidectomy"
+    },
+    {
+        "faiss_id": 99,
+        "clause_id": "12",
+        "parent_id": null,
+        "text": "12. Reconstruction of the middle ear"
+    },
+    {
+        "faiss_id": 100,
+        "clause_id": "13",
+        "parent_id": null,
+        "text": "13. Other excisions of the middle and inner ear"
+    },
+    {
+        "faiss_id": 101,
+        "clause_id": "14",
+        "parent_id": null,
+        "text": "14. Fenestration of the inner ear"
+    },
+    {
+        "faiss_id": 102,
+        "clause_id": "15",
+        "parent_id": null,
+        "text": "15. Revision of a fenestration of the inner ear"
+    },
+    {
+        "faiss_id": 103,
+        "clause_id": "16",
+        "parent_id": null,
+        "text": "16. Incision (opening) and destruction (elimination) of the inner ear"
+    },
+    {
+        "faiss_id": 104,
+        "clause_id": "17",
+        "parent_id": null,
+        "text": "17. Other operations on the middle and inner ear\nOperations on the nose & the nasal sinuses"
+    },
+    {
+        "faiss_id": 105,
+        "clause_id": "18",
+        "parent_id": null,
+        "text": "18. Excision and destruction of diseased tissue of the nose"
+    },
+    {
+        "faiss_id": 106,
+        "clause_id": "19",
+        "parent_id": null,
+        "text": "19. Operations on the turbinates (nasal concha)"
+    },
+    {
+        "faiss_id": 107,
+        "clause_id": "20",
+        "parent_id": null,
+        "text": "20. Other operations on the nose"
+    },
+    {
+        "faiss_id": 108,
+        "clause_id": "21",
+        "parent_id": null,
+        "text": "21. Nasal sinus aspiration\nOperations on the eyes"
+    },
+    {
+        "faiss_id": 109,
+        "clause_id": "22",
+        "parent_id": null,
+        "text": "22. Incision of tear glands\nPAGE 13"
+    },
+    {
+        "faiss_id": 110,
+        "clause_id": "24",
+        "parent_id": null,
+        "text": "24. Incision of diseased eyelids"
+    },
+    {
+        "faiss_id": 111,
+        "clause_id": "25",
+        "parent_id": null,
+        "text": "25. Excision and destruction of diseased tissue of the eyelid"
+    },
+    {
+        "faiss_id": 112,
+        "clause_id": "26",
+        "parent_id": null,
+        "text": "26. Incision of diseased eyelids"
+    },
+    {
+        "faiss_id": 113,
+        "clause_id": "27",
+        "parent_id": null,
+        "text": "27. Operations on the canthus and epicanthus"
+    },
+    {
+        "faiss_id": 114,
+        "clause_id": "28",
+        "parent_id": null,
+        "text": "28. Corrective surgery for entropion and ectropion"
+    },
+    {
+        "faiss_id": 115,
+        "clause_id": "29",
+        "parent_id": null,
+        "text": "29. Corrective surgery for blepharoptosis"
+    },
+    {
+        "faiss_id": 116,
+        "clause_id": "30",
+        "parent_id": null,
+        "text": "30. Removal of a foreign body from the conjunctiva"
+    },
+    {
+        "faiss_id": 117,
+        "clause_id": "31",
+        "parent_id": null,
+        "text": "31. Removal of a foreign body from the cornea"
+    },
+    {
+        "faiss_id": 118,
+        "clause_id": "32",
+        "parent_id": null,
+        "text": "32. Incision of the cornea"
+    },
+    {
+        "faiss_id": 119,
+        "clause_id": "33",
+        "parent_id": null,
+        "text": "33. Operations for pterygium"
+    },
+    {
+        "faiss_id": 120,
+        "clause_id": "34",
+        "parent_id": null,
+        "text": "34. Other operations on the cornea"
+    },
+    {
+        "faiss_id": 121,
+        "clause_id": "35",
+        "parent_id": null,
+        "text": "35. Removal of a foreign body from the lens of the eye"
+    },
+    {
+        "faiss_id": 122,
+        "clause_id": "36",
+        "parent_id": null,
+        "text": "36. Removal of a foreign body from the posterior chamber of the eye"
+    },
+    {
+        "faiss_id": 123,
+        "clause_id": "37",
+        "parent_id": null,
+        "text": "37. Removal of a foreign body from the orbit and eyeball"
+    },
+    {
+        "faiss_id": 124,
+        "clause_id": "38",
+        "parent_id": null,
+        "text": "38. Operation of cataract\nOperations on the skin & subcutaneous tissues"
+    },
+    {
+        "faiss_id": 125,
+        "clause_id": "39",
+        "parent_id": null,
+        "text": "39. Incision of a pilonidal sinus"
+    },
+    {
+        "faiss_id": 126,
+        "clause_id": "40",
+        "parent_id": null,
+        "text": "40. Other incisions of the skin and subcutaneous tissues"
+    },
+    {
+        "faiss_id": 127,
+        "clause_id": "41",
+        "parent_id": null,
+        "text": "41. Surgical wound toilet (wound debridement) and removal of\ndiseased tissue of the skin and subcutaneous tissues"
+    },
+    {
+        "faiss_id": 128,
+        "clause_id": "42",
+        "parent_id": null,
+        "text": "42. Local excision of diseased tissue of the skin and subcutaneous\ntissues"
+    },
+    {
+        "faiss_id": 129,
+        "clause_id": "43",
+        "parent_id": null,
+        "text": "43. Other excisions of the skin and subcutaneous tissues"
+    },
+    {
+        "faiss_id": 130,
+        "clause_id": "44",
+        "parent_id": null,
+        "text": "44. Simple restoration of surface continuity of the skin and\nsubcutaneous tissues"
+    },
+    {
+        "faiss_id": 131,
+        "clause_id": "45",
+        "parent_id": null,
+        "text": "45. Free skin transplantation, donor site"
+    },
+    {
+        "faiss_id": 132,
+        "clause_id": "46",
+        "parent_id": null,
+        "text": "46. Free skin transplantation, recipient site"
+    },
+    {
+        "faiss_id": 133,
+        "clause_id": "47",
+        "parent_id": null,
+        "text": "47. Revision of skin plasty"
+    },
+    {
+        "faiss_id": 134,
+        "clause_id": "48",
+        "parent_id": null,
+        "text": "48. Other restoration and reconstruction of the skin and\nsubcutaneous tissues"
+    },
+    {
+        "faiss_id": 135,
+        "clause_id": "49",
+        "parent_id": null,
+        "text": "49. Chemosurgery to the skin"
+    },
+    {
+        "faiss_id": 136,
+        "clause_id": "50",
+        "parent_id": null,
+        "text": "50. Destruction of diseased tissue in the skin and subcutaneous\ntissues\nOperations on the tongue"
+    },
+    {
+        "faiss_id": 137,
+        "clause_id": "51",
+        "parent_id": null,
+        "text": "51. Incision, excision and destruction of diseased tissue of the\ntongue"
+    },
+    {
+        "faiss_id": 138,
+        "clause_id": "52",
+        "parent_id": null,
+        "text": "52. Partial glossectomy"
+    },
+    {
+        "faiss_id": 139,
+        "clause_id": "53",
+        "parent_id": null,
+        "text": "53. Glossectomy"
+    },
+    {
+        "faiss_id": 140,
+        "clause_id": "54",
+        "parent_id": null,
+        "text": "54. Reconstruction of the tongue"
+    },
+    {
+        "faiss_id": 141,
+        "clause_id": "55",
+        "parent_id": null,
+        "text": "55. Other operations on the tongue\nOperations on the salivary glands & salivary ducts"
+    },
+    {
+        "faiss_id": 142,
+        "clause_id": "56",
+        "parent_id": null,
+        "text": "56. Incision and lancing of a salivary gland and a salivary duct"
+    },
+    {
+        "faiss_id": 143,
+        "clause_id": "57",
+        "parent_id": null,
+        "text": "57. Excision of diseased tissue of a salivary gland and a salivary duct"
+    },
+    {
+        "faiss_id": 144,
+        "clause_id": "58",
+        "parent_id": null,
+        "text": "58. Resection of a salivary gland"
+    },
+    {
+        "faiss_id": 145,
+        "clause_id": "59",
+        "parent_id": null,
+        "text": "59. Reconstruction of a salivary gland and a salivary duct"
+    },
+    {
+        "faiss_id": 146,
+        "clause_id": "60",
+        "parent_id": null,
+        "text": "60. Other operations on the salivary glands and salivary ducts\nOther operations on the mouth & face"
+    },
+    {
+        "faiss_id": 147,
+        "clause_id": "61",
+        "parent_id": null,
+        "text": "61. External incision and drainage in the region of the mouth, jaw\nand face"
+    },
+    {
+        "faiss_id": 148,
+        "clause_id": "63",
+        "parent_id": null,
+        "text": "63. Excision and destruction of diseased hard and soft palate"
+    },
+    {
+        "faiss_id": 149,
+        "clause_id": "64",
+        "parent_id": null,
+        "text": "64. Incision, excision and destruction in the mouth"
+    },
+    {
+        "faiss_id": 150,
+        "clause_id": "65",
+        "parent_id": null,
+        "text": "65. Plastic surgery to the floor of the mouth"
+    },
+    {
+        "faiss_id": 151,
+        "clause_id": "66",
+        "parent_id": null,
+        "text": "66. Palatoplasty"
+    },
+    {
+        "faiss_id": 152,
+        "clause_id": "67",
+        "parent_id": null,
+        "text": "67. Other operations in the mouth\nOperations on the tonsils & adenoids"
+    },
+    {
+        "faiss_id": 153,
+        "clause_id": "68",
+        "parent_id": null,
+        "text": "68. Transoral incision and drainage of a pharyngeal abscess"
+    },
+    {
+        "faiss_id": 154,
+        "clause_id": "69",
+        "parent_id": null,
+        "text": "69. Tonsillectomy without adenoidectomy"
+    },
+    {
+        "faiss_id": 155,
+        "clause_id": "70",
+        "parent_id": null,
+        "text": "70. Tonsillectomy with adenoidectomy"
+    },
+    {
+        "faiss_id": 156,
+        "clause_id": "71",
+        "parent_id": null,
+        "text": "71. Excision and destruction of a lingual tonsil"
+    },
+    {
+        "faiss_id": 157,
+        "clause_id": "72",
+        "parent_id": null,
+        "text": "72. Other operations on the tonsils and adenoids Trauma surgery\nand orthopaedics"
+    },
+    {
+        "faiss_id": 158,
+        "clause_id": "73",
+        "parent_id": null,
+        "text": "73. Incision on bone, septic and aseptic"
+    },
+    {
+        "faiss_id": 159,
+        "clause_id": "74",
+        "parent_id": null,
+        "text": "74. Closed reduction on fracture, luxation or epiphyseolysis with\nosteosynthesis"
+    },
+    {
+        "faiss_id": 160,
+        "clause_id": "75",
+        "parent_id": null,
+        "text": "75. Suture and other operations on tendons and tendon sheath"
+    },
+    {
+        "faiss_id": 161,
+        "clause_id": "76",
+        "parent_id": null,
+        "text": "76. Reduction of dislocation under GA"
+    },
+    {
+        "faiss_id": 162,
+        "clause_id": "77",
+        "parent_id": null,
+        "text": "77. Arthroscopic knee aspiration\nOperations on the breast"
+    },
+    {
+        "faiss_id": 163,
+        "clause_id": "78",
+        "parent_id": null,
+        "text": "78. Incision of the breast"
+    },
+    {
+        "faiss_id": 164,
+        "clause_id": "79",
+        "parent_id": null,
+        "text": "79. Operations on the nipple\nOperations on the digestive tract"
+    },
+    {
+        "faiss_id": 165,
+        "clause_id": "80",
+        "parent_id": null,
+        "text": "80. Incision and excision of tissue in the perianal region"
+    },
+    {
+        "faiss_id": 166,
+        "clause_id": "81",
+        "parent_id": null,
+        "text": "81. Surgical treatment of anal fistulas"
+    },
+    {
+        "faiss_id": 167,
+        "clause_id": "82",
+        "parent_id": null,
+        "text": "82. Surgical treatment of haemorrhoids"
+    },
+    {
+        "faiss_id": 168,
+        "clause_id": "83",
+        "parent_id": null,
+        "text": "83. Division of the anal sphincter (sphincterotomy)"
+    },
+    {
+        "faiss_id": 169,
+        "clause_id": "84",
+        "parent_id": null,
+        "text": "84. Other operations on the anus"
+    },
+    {
+        "faiss_id": 170,
+        "clause_id": "85",
+        "parent_id": null,
+        "text": "85. Ultrasound guided aspirations"
+    },
+    {
+        "faiss_id": 171,
+        "clause_id": "86",
+        "parent_id": null,
+        "text": "86. Sclerotherapy etc."
+    },
+    {
+        "faiss_id": 172,
+        "clause_id": "87",
+        "parent_id": null,
+        "text": "87. Laparoscopic cholecystectomy\nOperations on the female sexual organs"
+    },
+    {
+        "faiss_id": 173,
+        "clause_id": "88",
+        "parent_id": null,
+        "text": "88. Incision of the ovary"
+    },
+    {
+        "faiss_id": 174,
+        "clause_id": "89",
+        "parent_id": null,
+        "text": "89. Insufflation of the Fallopian tubes"
+    },
+    {
+        "faiss_id": 175,
+        "clause_id": "90",
+        "parent_id": null,
+        "text": "90. Other operations on the Fallopian tube"
+    },
+    {
+        "faiss_id": 176,
+        "clause_id": "91",
+        "parent_id": null,
+        "text": "91. Dilatation of the cervical canal"
+    },
+    {
+        "faiss_id": 177,
+        "clause_id": "92",
+        "parent_id": null,
+        "text": "92. Conisation of the uterine cervix"
+    },
+    {
+        "faiss_id": 178,
+        "clause_id": "93",
+        "parent_id": null,
+        "text": "93. Other operations on the uterine cervix"
+    },
+    {
+        "faiss_id": 179,
+        "clause_id": "94",
+        "parent_id": null,
+        "text": "94. Incision of the uterus (hysterotomy)"
+    },
+    {
+        "faiss_id": 180,
+        "clause_id": "95",
+        "parent_id": null,
+        "text": "95. Therapeutic curettage"
+    },
+    {
+        "faiss_id": 181,
+        "clause_id": "96",
+        "parent_id": null,
+        "text": "96. Culdotomy"
+    },
+    {
+        "faiss_id": 182,
+        "clause_id": "97",
+        "parent_id": null,
+        "text": "97. Incision of the vagina"
+    },
+    {
+        "faiss_id": 183,
+        "clause_id": "98",
+        "parent_id": null,
+        "text": "98. Local excision and destruction of diseased tissue of the vagina\nand the pouch of Douglas"
+    },
+    {
+        "faiss_id": 184,
+        "clause_id": "99",
+        "parent_id": null,
+        "text": "99. Incision of the vulva"
+    },
+    {
+        "faiss_id": 185,
+        "clause_id": "100",
+        "parent_id": null,
+        "text": "100. Operations on Bartholin’s glands (cyst)\nOperations on the prostate & seminal vesicles"
+    },
+    {
+        "faiss_id": 186,
+        "clause_id": "101",
+        "parent_id": null,
+        "text": "101. Incision of the prostate\nPAGE 14"
+    },
+    {
+        "faiss_id": 187,
+        "clause_id": "103",
+        "parent_id": null,
+        "text": "103. Transurethral and percutaneous destruction of prostate tissue"
+    },
+    {
+        "faiss_id": 188,
+        "clause_id": "104",
+        "parent_id": null,
+        "text": "104. Open surgical excision and destruction of prostate tissue"
+    },
+    {
+        "faiss_id": 189,
+        "clause_id": "105",
+        "parent_id": null,
+        "text": "105. Radical prostatovesiculectomy"
+    },
+    {
+        "faiss_id": 190,
+        "clause_id": "106",
+        "parent_id": null,
+        "text": "106. Other excision and destruction of prostate tissue"
+    },
+    {
+        "faiss_id": 191,
+        "clause_id": "107",
+        "parent_id": null,
+        "text": "107. Operations on the seminal vesicles"
+    },
+    {
+        "faiss_id": 192,
+        "clause_id": "108",
+        "parent_id": null,
+        "text": "108. Incision and excision of periprostatic tissue"
+    },
+    {
+        "faiss_id": 193,
+        "clause_id": "109",
+        "parent_id": null,
+        "text": "109. Other operations on the prostate\nOperations on the scrotum & tunica vaginalis testis"
+    },
+    {
+        "faiss_id": 194,
+        "clause_id": "110",
+        "parent_id": null,
+        "text": "110. Incision of the scrotum and tunica vaginalis testis"
+    },
+    {
+        "faiss_id": 195,
+        "clause_id": "111",
+        "parent_id": null,
+        "text": "111. Operation on a testicular hydrocele"
+    },
+    {
+        "faiss_id": 196,
+        "clause_id": "112",
+        "parent_id": null,
+        "text": "112. Excision and destruction of diseased scrotal tissue"
+    },
+    {
+        "faiss_id": 197,
+        "clause_id": "113",
+        "parent_id": null,
+        "text": "113. Plastic reconstruction of the scrotum and tunica vaginalis testis"
+    },
+    {
+        "faiss_id": 198,
+        "clause_id": "114",
+        "parent_id": null,
+        "text": "114. Other operations on the scrotum and tunica vaginalis testis\nOperations on the testes"
+    },
+    {
+        "faiss_id": 199,
+        "clause_id": "115",
+        "parent_id": null,
+        "text": "115. Incision of the testes"
+    },
+    {
+        "faiss_id": 200,
+        "clause_id": "116",
+        "parent_id": null,
+        "text": "116. Excision and destruction of diseased tissue of the testes"
+    },
+    {
+        "faiss_id": 201,
+        "clause_id": "117",
+        "parent_id": null,
+        "text": "117. Unilateral orchidectomy"
+    },
+    {
+        "faiss_id": 202,
+        "clause_id": "118",
+        "parent_id": null,
+        "text": "118. Bilateral orchidectomy"
+    },
+    {
+        "faiss_id": 203,
+        "clause_id": "119",
+        "parent_id": null,
+        "text": "119. Orchidopexy"
+    },
+    {
+        "faiss_id": 204,
+        "clause_id": "120",
+        "parent_id": null,
+        "text": "120. Abdominal exploration in cryptorchidism"
+    },
+    {
+        "faiss_id": 205,
+        "clause_id": "121",
+        "parent_id": null,
+        "text": "121. Surgical repositioning of an abdominal testis"
+    },
+    {
+        "faiss_id": 206,
+        "clause_id": "122",
+        "parent_id": null,
+        "text": "122. Reconstruction of the testis"
+    },
+    {
+        "faiss_id": 207,
+        "clause_id": "123",
+        "parent_id": null,
+        "text": "123. Implantation, exchange and removal of a testicular prosthesis"
+    },
+    {
+        "faiss_id": 208,
+        "clause_id": "124",
+        "parent_id": null,
+        "text": "124. Other operations on the penis\nOperations on the spermatic cord, epididymis und ductus\ndeferens"
+    },
+    {
+        "faiss_id": 209,
+        "clause_id": "125",
+        "parent_id": null,
+        "text": "125. Surgical treatment of a varicocele and a hydrocele of the\nspermatic cord"
+    },
+    {
+        "faiss_id": 210,
+        "clause_id": "126",
+        "parent_id": null,
+        "text": "126. Excision in the area of the epididymis"
+    },
+    {
+        "faiss_id": 211,
+        "clause_id": "127",
+        "parent_id": null,
+        "text": "127. Epididymectomy"
+    },
+    {
+        "faiss_id": 212,
+        "clause_id": "128",
+        "parent_id": null,
+        "text": "128. Reconstruction of the spermatic cord"
+    },
+    {
+        "faiss_id": 213,
+        "clause_id": "129",
+        "parent_id": null,
+        "text": "129. Reconstruction of the ductus deferens and epididymis"
+    },
+    {
+        "faiss_id": 214,
+        "clause_id": "130",
+        "parent_id": null,
+        "text": "130. Other operations on the spermatic cord, epididymis and\nductus deferens\nOperations on the penis"
+    },
+    {
+        "faiss_id": 215,
+        "clause_id": "131",
+        "parent_id": null,
+        "text": "131. Operations on the foreskin"
+    },
+    {
+        "faiss_id": 216,
+        "clause_id": "132",
+        "parent_id": null,
+        "text": "132. Local excision and destruction of diseased tissue of the penis"
+    },
+    {
+        "faiss_id": 217,
+        "clause_id": "133",
+        "parent_id": null,
+        "text": "133. Amputation of the penis"
+    },
+    {
+        "faiss_id": 218,
+        "clause_id": "134",
+        "parent_id": null,
+        "text": "134. Plastic reconstruction of the penis"
+    },
+    {
+        "faiss_id": 219,
+        "clause_id": "135",
+        "parent_id": null,
+        "text": "135. Other operations on the penis\nOperations on the urinary system"
+    },
+    {
+        "faiss_id": 220,
+        "clause_id": "136",
+        "parent_id": null,
+        "text": "136. Cystoscopical removal of stones\nOther Operations"
+    },
+    {
+        "faiss_id": 221,
+        "clause_id": "137",
+        "parent_id": null,
+        "text": "137. Lithotripsy"
+    },
+    {
+        "faiss_id": 222,
+        "clause_id": "138",
+        "parent_id": null,
+        "text": "138. Coronary angiography"
+    },
+    {
+        "faiss_id": 223,
+        "clause_id": "139",
+        "parent_id": null,
+        "text": "139. Haemodialysis"
+    },
+    {
+        "faiss_id": 224,
+        "clause_id": "140",
+        "parent_id": null,
+        "text": "140. Radiotherapy for Cancer\n141 Cancer Chemotherapy\nANNEXURE II\nList I - Items for which coverage is not available in the policy\nSI No\nItem\n1\nBABY FOOD\n2\nBABY UTILITIES CHARGES\n3\nBEAUTY SERVICES\n4\nBELTS/ BRACES\n5\nBUDS\n6\nCOLD PACK/HOT PACK\n7\nCARRY BAGS\n8\nEMAIL / INTERNET CHARGES\n9\nFOOD CHARGES OTHER THAN PATIENT's DIET\nPROVIDED BY HOSPITAL\n10\nLEGGINGS\n11\nLAUNDRY CHARGES\n12\nMINERAL WATER\n13\nSANITARY PAD\n14\nTELEPHONE CHARGES\n15\nGUEST SERVICES\n16\nCREPE BANDAGE\n17\nDIAPER OF ANY TYPE\n18\nEYELET COLLAR\n19\nSLINGS\n20\nBLOOD GROUPING AND CROSS MATCHING OF\nDONORS SAMPLES\n21\nSERVICE CHARGES WHERE NURSING CHARGE ALSO\nCHARGED\n22\nTELEVISION CHAR ES\n23\nSURCHARGES\n24\nATTENDANT CHARGES\n25\nEXTRA DIET OF PATIENT (OTHER THAN THAT WHICH\nFORMS PART OF BED CHARGE\n26\nBIRTH CERTIFICATE\n27\nCERTIFICATE CHARGES\n28\nCOURIER CHARGES\n29\nCONVEYANCE CHARGES\n30\nMEDICAL CERTIFICATE\n31\nMEDICAL RECORDS\n32\nPHOTOCOPIES CHARGES\n33\nMORTUARY CHARGES\n34\nWALKING AIDS CHARGES\n35\nOXYGEN CYLINDER FOR USAGE OUTSIDE THE HOSPITAL\n36\nSPACER\n37\nSPIROMETRE\n38\nNEBULIZER KIT\n39\nSTEAM INHALER\n40\nARMSLING\n41\nTHERMOMETER\n42\nCERVICAL COLLAR\n43\nSPLINT\n44\nDIABETIC FOOTWEAR\n45\nKNEE BRACES LONG/ SHORT/ HINGED\n46\nKNEE IMMOBILIZER/SHOULDER IMMOBILIZER\n47\nLUMBO SACRAL BELT\n48\nNIMBUS BED OR WATER OR AIR BED CHARGES\n49\nAMBULANCE COLLAR\n50\nAMBULANCE EQUIPMENT\n51\nABDOMINAL BINDER\nPAGE 15\n52\nPRIVATE NURSES CHARGES- SPECIAL NURSING CHARGES\n53\nSUGAR FREE Tablets\n54\nCREAMS POWDERS LOTIONS (Toiletries are not payable,\nonly prescribed medical pharmaceuticals payable\n55 ECG ELECTRODES\n56\nGLOVES\n57\nNEBULISATION KIT\n58\nANY KIT WITH NO DETAILS MENTIONED [DELIVERY KIT,\nORTHOKIT, RECOVERY KIT, ETC\n59\nKIDNEY TRAY\n60\nMASK\n61\nOUNCE GLASS\n62\nOXYGEN MASK\n63\nPELVIC TRACTION BELT\n64\nPAN CAN\n65\nTROLLY COVER\n66\nUROMETER, URINE JUG\n67\nAMBULANCE\n68\nVASOFIX SAFETY\nList II - Items that are to be subsumed into Room charges\nNo.\nItem\n1\nBABY CHARGES UNLESS SPECIFIED/INDICATED\n2\nHAND WASH\n3\nSHOE COVER\n4\nCAPS\n5\nCRADLE CHARGES\n6\nCOMB\n7\nEAU-DE-COLOGNE / ROOM FRESHNERS\n8\nFOOT COVER\n9\nGOWN\n10\nSLIPPERS\n11\nTISSUE PAPER\n12\nTOOTH-PASTE\n13\nTOOTH-BRUSH\n14\nBED PAN\n15\nFACE MASK\n16\nFLEXI MASK\n17\nHAND HOLDER\n18\nSPUTUM CUP\n19\nDISINFECTANT LOTIONS\n20\nLUXURY TAX\n21\nHVAC\n22\nHOUSE KEEPING CHARGES\n23\nAIR CONDITIONER CHARGES\n24\n1M IV INJECTION CHARGES\n25\nCLEAN SHEET\n26\nBLANKET/VVARMER BLANKET\n27\nADMISSION KIT\n28\nDIABETIC CHART CHARGES\n29\nDOCUMENTATION CHARGES / ADMINISTRATIVE\nEXPENSES\n30\nDISCHARGE PROCEDURE CHARGES\n31\nDAILY CHART CHARGES\n32\nENTRANCE PASS / VISITORS PASS CHARGES\n34\nFILE OPENING CHARGES\n35\nINCIDENTAL EXPENSES / MISC. CHARGES NOT\nEXPLAINED\n36\nPATIENT IDENTIFICATION BAND / NAME TAG\n37\nPULSEOXYMETER CHARGES\nList III - Items that are to be subsumed into Procedure Charges\nNo.\nItem\n1\nHAIR REMOVAL CREAM\n2\nDISPOSABLES RAZORS CHARGES (for site preparations)\n3\nEYE PAD\n4\nEYE SHEILD\n5\nCAMERA COVER\n6\nDVD, CD CHARGES\n7\nCAUSE SOFT\n8\nGAUZE\n9\nWARD AND THEATRE BOOKING CHARGES\n10\nARTHROSCOPY AND ENDOSCOPY INSTRUMENTS\n11\nMICROSCOPE COVER\n12\nSURGICAL BLADES, HARMONICSCALPEL, SHAVER\n13\nSURGICAL DRILL\n14\nEYE KIT\n15\nEYE DRAPE\n16\nX-RAY FILM\n17\nBOYLES APPARATUS CHARGES\n18\nCOTTON\n19\nCOTTON BANDAGE\n20\nSURGICAL TAPE\n21\nAPRON\n22\nTORNIQUET\n23\nORTHOBUNDLE, GYNAEC BUNDLE\nList IV - Items that are to be subsumed into costs of treatment\nNo.\nItem\n1\nADMISSION/REGISTRATION CHARGES\n2\nHOSPITALISATION FOR EVALUATION/ DIAGNOSTIC\nPURPOSE\n3\nURINE CONTAINER\n4\nBLOOD RESERVATION CHARGES AND ANTE NATAL\nBOOKING CHARGES\n5\nBIPAP MACHINE\n6\nCPAP/ CAPD EQUIPMENTS\n7\nINFUSION PUMP- COST\n8\nHYDROGEN PEROXIDE/SPIRIT/DISINFECTANTS ETC\n9\nNUTRITION PLANNING CHARGES - DIETICIAN CHARGES\n- DIET CHARGES\n10 HIV KIT\n11 ANTISEPTIC MOUTHWASH\n12 LOZENGES\n13 MOUTH PAINT\n14 VACCINATION CHARGES\n15 ALCOHOL SWABES\n16 SCRUB SOLUTION/STERILLIUM\n17 Glucometer & Strips\nPAGE 16\nENDORSEMENTS\nIt is hereby agreed that any or all endorsements issued with this\nPolicy or endorsed thereon in shall be expressly subject to the terms\nand conditions and exclusions of this Policy, except to the extent\nexpressly varied by the endorsement and shall become applicable\nonly upon endorsement and after our receipt of requisite additional\npremiums. All other Policy terms, conditions and exclusions shall\nremain unchanged."
+    },
+    {
+        "faiss_id": 225,
+        "clause_id": "1",
+        "parent_id": null,
+        "text": "1. Ambulance expenses cover:\nIt is hereby declared and agreed that we will reimburse 1% of Sum\n`1500\nInsured per Person per Policy period up to a maximum of\ntowards the utilisation of an ambulance for the Insured Person\nbeing transported to the hospital for treatment of the\nillness/disease/injury and upon producing the bills in original.\nAmbulance services used are to be of a licensed operator.\nAll other terms and conditions under the policy remain unaltered."
+    },
+    {
+        "faiss_id": 226,
+        "clause_id": "2",
+        "parent_id": null,
+        "text": "2. Annual medical check-up:\nWe will reimburse the reasonable and customary charges\nincurred by an Insured Person for a health check-up at any of the\nInsurer's empanelled diagnostic centre or at any other diagnostic\ncentre, provided that:\na. The Health Check-up is to be undertaken within the Policy\nPeriod,\nb. Our maximum liability under this Endorsement will be limited\n`2500\nto - 1% of sum insured up to a maximum of Per Policy\nPeriod.\nAll other terms and conditions under the policy remain unaltered."
+    },
+    {
+        "faiss_id": 227,
+        "clause_id": "3",
+        "parent_id": null,
+        "text": "3. Maternity Benefit Extension with waiting period of 9 months:\nIt is hereby declared and agreed that the exclusion No.20 of the\n“Exclusions” stands deleted and Insurer will reimburse medical\nexpenses up to the limits and sub limits as mentioned in the\nSchedule against the Insured Persons. Expenses incurred\ntowards the normal baby care after delivery is not covered under\nthis benefit.\nOption for Maternity Benefits has to be exercised at the inception\nof the policy period and no refund is allowable in case of Insured's\ncancellation of this option during the term of the policy. These\nBenefits are admissible only if the expenses are incurred in a\nHospital as an in-patient in India.\nThe benefit under this Policy shall be payable after a period of 9\nmonths from the date of inception of the Policy in so far as the\nperiod of 9 months applicable for payment of any claim under this\nbenefit. However, Insurer may at its absolute discretion relax the\nabove period of 9 months in case of a medical emergency or\naccident resulting in delivery, mis-carriage or abortion.\nClaim in respect of delivery for only first two living children and/or\noperations associated therewith will be considered in respect of\nany one Insured Person. Those Insured Persons who are already\nhaving two or more living children will not be eligible for this benefit.\nExpenses incurred in connection with voluntary medical\ntermination of pregnancy are not covered.\nPre-natal and post-natal expenses are not covered unless the\nsame require Hospitalisation and within the meaning of\nhospitalisation as defined under the standard policy wordings.\nThis benefit is available as a part of Maternity Sublimit.\nAll other terms and conditions under the policy remain unaltered."
+    },
+    {
+        "faiss_id": 228,
+        "clause_id": "4",
+        "parent_id": null,
+        "text": "4. Maternity Benefit Extension without waiting period of\n9 months:\n“Exclusions” stands deleted and Insurer will reimburse medical\nexpenses up to the limits and sub limits as mentioned in the\nSchedule against the Insured Persons. Expenses incurred\ntowards the normal baby care after delivery is not covered under\nthis benefit.\nOption for Maternity Benefits has to be exercised at the inception\nof the policy period and no refund is allowable in case of Insured's\ncancellation of this option during the term of the policy. These\nBenefits are admissible only if the expenses are incurred in a\nHospital as an in-patient in India.\nClaim in respect of delivery for only first two living children and/or\noperations associated therewith will be considered in respect of\nany one Insured Person. Those Insured Persons who are already\nhaving two or more living children will not be eligible for this\nbenefit.\nExpenses incurred in connection with voluntary medical\ntermination of pregnancy are not covered.\nPre-natal and post-natal expenses are not covered unless the\nsame require Hospitalisation and within the meaning of\nhospitalisation as defined under the standard policy wordings.\nThis benefit is available as a part of Maternity Sublimit.\nAll other terms and conditions under the policy remain\nunaltered."
+    },
+    {
+        "faiss_id": 229,
+        "clause_id": "5",
+        "parent_id": null,
+        "text": "5. New Born Cover from Day One:\nIt is hereby declared and agreed that we will cover the new born\nbabies of any Insured Person from the date of birth of the baby, for\nany disease/sickness/ailment/Injury. The limit opted for this\ncover is distinct and is not inclusive of the maternity cover limit\nopted. All other terms and conditions under the policy remain\nunaltered."
+    },
+    {
+        "faiss_id": 230,
+        "clause_id": "6",
+        "parent_id": null,
+        "text": "6. Critical Illness Cover:\nIt is hereby declared and agreed that we will reimburse the\nReasonable and Customary Charges incurred for the treatment\nof “Critical Illness” as defined below and under the policy up to an\nadditional SumInsured limit equal to his/her Basic Sum Insured.\nThis benefit will be available to the insured persons only upon\nexhaustion of the Basic Sum Insured under the standard\nhospitalisation benefit available under the policy. All the\nmonetary sub-limits as applicable under the policy would be\napplicable for this cover also. Provided that\nInsured Person"
+    },
+    {
+        "faiss_id": 231,
+        "clause_id": "1",
+        "parent_id": null,
+        "text": "1. The is first diagnosed as suffering from a\nCritical Illness during the Policy Period\nCritical Illness"
+    },
+    {
+        "faiss_id": 232,
+        "clause_id": "2",
+        "parent_id": null,
+        "text": "2. means –"
+    },
+    {
+        "faiss_id": 233,
+        "clause_id": "1",
+        "parent_id": null,
+        "text": "1. Cancer of specified severity,"
+    },
+    {
+        "faiss_id": 234,
+        "clause_id": "2",
+        "parent_id": null,
+        "text": "2. Open Chest CABG"
+    },
+    {
+        "faiss_id": 235,
+        "clause_id": "3",
+        "parent_id": null,
+        "text": "3. Aorta Graft Surgery,"
+    },
+    {
+        "faiss_id": 236,
+        "clause_id": "4",
+        "parent_id": null,
+        "text": "4. Open Heart Replacement or Repair of Heart Valves"
+    },
+    {
+        "faiss_id": 237,
+        "clause_id": "5",
+        "parent_id": null,
+        "text": "5. Stroke Resulting in Permanent Symptoms"
+    },
+    {
+        "faiss_id": 238,
+        "clause_id": "6",
+        "parent_id": null,
+        "text": "6. First Heart Attack – Of Specified Severity"
+    },
+    {
+        "faiss_id": 239,
+        "clause_id": "7",
+        "parent_id": null,
+        "text": "7. Kidney Failure Requiring Regular Dialysis"
+    },
+    {
+        "faiss_id": 240,
+        "clause_id": "8",
+        "parent_id": null,
+        "text": "8. Primary Pulmonary Arterial Hypertension,"
+    },
+    {
+        "faiss_id": 241,
+        "clause_id": "9",
+        "parent_id": null,
+        "text": "9. Major Organ/ Bone Marrow Transplant"
+    },
+    {
+        "faiss_id": 242,
+        "clause_id": "10",
+        "parent_id": null,
+        "text": "10. Multiple Sclerosis with Persisting Symptoms"
+    },
+    {
+        "faiss_id": 243,
+        "clause_id": "11",
+        "parent_id": null,
+        "text": "11. Coma of Specified Severity"
+    },
+    {
+        "faiss_id": 244,
+        "clause_id": "12",
+        "parent_id": null,
+        "text": "12. Total Blindness"
+    },
+    {
+        "faiss_id": 245,
+        "clause_id": "13",
+        "parent_id": null,
+        "text": "13. Permanent Paralysis of Limbs\nPAGE 17\nAll as defined below only:"
+    },
+    {
+        "faiss_id": 246,
+        "clause_id": "1",
+        "parent_id": null,
+        "text": "1. Cancer\nI. A malignant tumour characterised by the uncontrolled\ngrowth & spread of malignant cells with invasion & destruction\nof normal tissues. This diagnosis must be supported by\nhistological evidence of malignancy & confirmed by a\npathologist. The term cancer includes leukemia, lymphoma\nand sarcoma.\nII. The following are excluded -"
+    },
+    {
+        "faiss_id": 247,
+        "clause_id": "1",
+        "parent_id": null,
+        "text": "1. Tumours showing the malignant changes of carcinoma in situ\n& tumours which are histologically described as premalignant\nor non invasive, including but not limited to: Carcinoma in situ\nof breasts, Cervical dysplasia CIN-1, CIN -2 & CIN-3."
+    },
+    {
+        "faiss_id": 248,
+        "clause_id": "2",
+        "parent_id": null,
+        "text": "2. Any skin cancer other than invasive malignant melanoma"
+    },
+    {
+        "faiss_id": 249,
+        "clause_id": "3",
+        "parent_id": null,
+        "text": "3. All tumours of the prostate unless histologically classified as\nhaving a Gleason score greater than 6 or having progressed to\nat least clinical TNM classification T2N0M0........."
+    },
+    {
+        "faiss_id": 250,
+        "clause_id": "4",
+        "parent_id": null,
+        "text": "4. Papillary micro - carcinoma of the thyroid less than 1 cm in\ndiameter"
+    },
+    {
+        "faiss_id": 251,
+        "clause_id": "5",
+        "parent_id": null,
+        "text": "5. Chronic lymphocyctic leukaemia less than RAI stage 3"
+    },
+    {
+        "faiss_id": 252,
+        "clause_id": "6",
+        "parent_id": null,
+        "text": "6. Microcarcinoma of the bladder"
+    },
+    {
+        "faiss_id": 253,
+        "clause_id": "7",
+        "parent_id": null,
+        "text": "7. All tumours in the presence of HIV infection."
+    },
+    {
+        "faiss_id": 254,
+        "clause_id": "2",
+        "parent_id": null,
+        "text": "2. Open Chest CABG"
+    },
+    {
+        "faiss_id": 255,
+        "clause_id": "1",
+        "parent_id": null,
+        "text": "1. The actual undergoing of open chest surgery for the\ncorrection of one or more coronary arteries, which is/are\nnarrowed or blocked, by coronary artery bypass graft (CABG).\nThe diagnosis must be supported by a coronary angiography\nand the realization of surgery has to be confirmed by a\nspecialist medical practitioner."
+    },
+    {
+        "faiss_id": 256,
+        "clause_id": "2",
+        "parent_id": null,
+        "text": "2. The following are excluded:"
+    },
+    {
+        "faiss_id": 257,
+        "clause_id": "1",
+        "parent_id": null,
+        "text": "1. Angioplasty and/or any other intra-arterial procedures"
+    },
+    {
+        "faiss_id": 258,
+        "clause_id": "2",
+        "parent_id": null,
+        "text": "2. any key-hole or laser surgery."
+    },
+    {
+        "faiss_id": 259,
+        "clause_id": "3",
+        "parent_id": null,
+        "text": "3. Aorta Graft Surgery\nThe actual undergoing of surgery for disease of the aorta needing\nexcision and surgical replacement of a portion of the diseased\naorta with a graft. For this definition, aorta means the thoracic\nand abdominal aorta but not its branches.\nSurgery following traumatic injury to the aorta is not covered.\nSurgery to treat peripheral vascular disease of the aortic\nbranches is excluded even if a portion of the aorta is removed\nduring the operative procedures. Surgery performed using only\nminimally invasive or intra- arterial techniques such as\npercutaneous endovascular aneurysm with insertion of a stent\ngraft are excluded."
+    },
+    {
+        "faiss_id": 260,
+        "clause_id": "4",
+        "parent_id": null,
+        "text": "4. Open Heart Replacement or Repair of Heart Valves\nThe actual undergoing of open-heart valve surgery is to replace\nor repair one or more heart valves, as a consequence of defects\nin, abnormalities of, or disease-affected cardiac valve(s). The\ndiagnosis of the valve abnormality must be supported by an\nechocardiography and the realization of surgery has to be\nconfirmed by a specialist medical practitioner. Catheter based\ntechniques including but not limited to, balloon valvotomy/\nvalvuloplasty are excluded."
+    },
+    {
+        "faiss_id": 261,
+        "clause_id": "5",
+        "parent_id": null,
+        "text": "5. Stroke Resulting in Permanent Symptoms\na. Any cerebrovascular incident producing permanent neurological\nsequelae.This includes infarction of brain tissue, thrombosis in an\nintracranial vessel, haemorrhage and embolisation from an\nmedical practitioner and evidenced by typical clinical symptoms\nas well as typical findings in CT Scan or MRI of the brain. Evidence\nof permanent neurological deficit lasting for at least 3 months\nhas to be produced.\nb. The following are excluded:"
+    },
+    {
+        "faiss_id": 262,
+        "clause_id": "1",
+        "parent_id": null,
+        "text": "1. Transient ischemic attacks (TIA)"
+    },
+    {
+        "faiss_id": 263,
+        "clause_id": "2",
+        "parent_id": null,
+        "text": "2. Traumatic injury of the brain"
+    },
+    {
+        "faiss_id": 264,
+        "clause_id": "3",
+        "parent_id": null,
+        "text": "3. Vascular disease affecting only the eye or optic nerve or\nvestibular functions."
+    },
+    {
+        "faiss_id": 265,
+        "clause_id": "6",
+        "parent_id": null,
+        "text": "6. First Heart Attack – Of Specified Severity\ni. The first occurrence of myocardial infarction which means the\ndeath of a portion of the heart muscle as a result of\ninadequate blood supply to the relevant area. The diagnosis\nfor this will be evidenced by all of the following criteria:"
+    },
+    {
+        "faiss_id": 266,
+        "clause_id": "1",
+        "parent_id": null,
+        "text": "1. a history of typical clinical symptoms consistent with the\ndiagnosis of Acute Myocardial Infarction (for e.g. typical\nchest pain)"
+    },
+    {
+        "faiss_id": 267,
+        "clause_id": "2",
+        "parent_id": null,
+        "text": "2. new characteristic electrocardiogram changes"
+    },
+    {
+        "faiss_id": 268,
+        "clause_id": "3",
+        "parent_id": null,
+        "text": "3. elevation of infarction specific enzymes, Troponins or\nother specific biochemical markers.\nii. The following are excluded:"
+    },
+    {
+        "faiss_id": 269,
+        "clause_id": "1",
+        "parent_id": null,
+        "text": "1. Non-ST-segment elevation myocardial infarction (NSTEMI)\nwith elevation of Troponin I or T"
+    },
+    {
+        "faiss_id": 270,
+        "clause_id": "2",
+        "parent_id": null,
+        "text": "2. Other acute Coronary Syndromes"
+    },
+    {
+        "faiss_id": 271,
+        "clause_id": "3",
+        "parent_id": null,
+        "text": "3. Any type of angina pectoris."
+    },
+    {
+        "faiss_id": 272,
+        "clause_id": "7",
+        "parent_id": null,
+        "text": "7. Kidney Failure Requiring Regular Dialysis\nEnd stage renal disease presenting as chronic irreversible failure\nof both kidneys to function, as a result of which either regular renal\ndialysis (hemodialysis or peritoneal dialysis) is instituted or renal\ntransplantation is carried out. Diagnosis has to be confirmed by a\nspecialist medical practitioner."
+    },
+    {
+        "faiss_id": 273,
+        "clause_id": "8",
+        "parent_id": null,
+        "text": "8. Primary Pulmonary Arterial Hypertension\nPrimary Pulmonary Hypertension is characterized by elevated\npulmonary artery pressure with no apparent cause and\nsubstantial right ventricular enlargement confirmed by a\nCardiologist with the help of investigations including Cardiac\nCatheterization (cardiac catheterization proving the pulmonary\npressure to be above 30 mm of Hg), resulting in permanent\nirreversible physical impairment of at least Class IV ofthe New\nYork Heart Association (NYHA) Classification of Cardiac\nImpairment and resulting in the Insured being unable to perform\nhis / her usual occupation.\nThe latest NYHA Classification of Cardiac Impairment shall be\nused. Diagnosis and Treatment – 39th Edition”):\nClass I: No limitation of physical activity. Ordinary physical\nactivity does not cause undue fatigue, dyspnoea, or angina pain.\nClass II: Slight limitation of physical activity. Ordinary physical\nactivity results in symptoms.\nClass III: Marked limitation of physical activity. Comfortable at\nrest, but less than ordinary activity causes symptoms.\nClass IV: Unable to engage in any physical activity without\ndiscomfort. Symptoms may be present even at rest."
+    },
+    {
+        "faiss_id": 274,
+        "clause_id": "9",
+        "parent_id": null,
+        "text": "9. Major Organ/ Bone Marrow Transplant\na) The actual undergoing of a transplant of:\na. One of the following human organs: heart, lung, liver,\nkidney, pancreas, that resulted from irreversible end-stage\nPAGE 18\nb. Human bone marrow using haematopoietic stem cells.\nThe undergoing of a transplant has to be confirmed by a\nspecialist medical practitioner.\nb) The following are excluded:\na. Other stem-cell transplants\nb. Where only islets of langerhans are transplanted"
+    },
+    {
+        "faiss_id": 275,
+        "clause_id": "10",
+        "parent_id": null,
+        "text": "10. Multiple Sclerosis with Persisting Symptoms\na. The definite occurrence of multiple sclerosis. The diagnosis\nmust be supported by all of the following:\ni. investigations including typical MRI and CSF findings,\nwhich unequivocally confirm the diagnosis to be multiple\nsclerosis;\nii. there must be current clinical impairment of motor or\nsensory function, which must have persisted for a\ncontinuous period of at least 6 months, and\niii. well documented clinical history of exacerbations and\nremissions of said symptoms or neurological deficits with\natleast two clinically documented episodes at least one\nmonth apart.\nb. Other causes of neurological damage such as SLE and HIV are\nexcluded."
+    },
+    {
+        "faiss_id": 276,
+        "clause_id": "11",
+        "parent_id": null,
+        "text": "11. Coma of Specified Severity\nA state of unconsciousness with no reaction or response to\nexternal stimuli or internal needs. This diagnosis must be\nsupported by evidence of all of the following:\na. no response to external stimuli continuously for at least 96\nhours;\nb. life support measures are necessary to sustain life; and\nc. permanent neurological deficit which must be assessed at\nleast 30 days after the onset of the coma.\nThe condition has to be confirmed by a specialist medical\npractitioner. Coma resulting directly from alcohol or drug abuse is\nexcluded."
+    },
+    {
+        "faiss_id": 277,
+        "clause_id": "12",
+        "parent_id": null,
+        "text": "12. Total Blindness:\nTotal, permanent and irreversible loss of all sight in both eyes as a\nresult of sickness or accident. Diagnosis has to be confirmed by a\nspecialist (best by an ophthalmologist) and evidenced by specific\ntest results."
+    },
+    {
+        "faiss_id": 278,
+        "clause_id": "13",
+        "parent_id": null,
+        "text": "13. Permanent Paralysis of Limbs\nTotal and irreversible loss of use of two or more limbs as a result of\ninjury or disease of the brain or spinal cord. A specialist medical\npractitioner must be of the opinion that the paralysis will be\npermanent with no hope of recovery and must be present for\nmore than 3 months."
+    },
+    {
+        "faiss_id": 279,
+        "clause_id": "14",
+        "parent_id": null,
+        "text": "14. Pre-existing Disease Exclusion Waiver:\nIt is hereby declared and agreed that the exclusion No.1 of the\n“Exclusions” stands deleted and Insurer will pay the expenses up\nto the limits and sub limits as mentioned in the Schedule against\nthe insured persons. All other terms and conditions under the\npolicy remain unaltered."
+    },
+    {
+        "faiss_id": 280,
+        "clause_id": "15",
+        "parent_id": null,
+        "text": "15. First year Exclusions Waiver:\nIt is hereby declared and agreed that the exclusion No.3 of the\n“Exclusions” stands deleted and Insurer will pay the expenses up\nto the limits and sub limits as mentioned in the Schedule against\nthe insured persons. All other terms and conditions under the\npolicy remain unaltered."
+    },
+    {
+        "faiss_id": 281,
+        "clause_id": "16",
+        "parent_id": null,
+        "text": "16. First 30 days Exclusion Waiver:\n“Exclusions” stands deleted and Insurer will pay the expenses\nup to the limits and sub limits as mentioned in the Schedule\nagainst the insured persons.\nAll other terms and conditions under the policy remain\nunaltered."
+    },
+    {
+        "faiss_id": 282,
+        "clause_id": "17",
+        "parent_id": null,
+        "text": "17. Coverage for Ayurvedic Medicine:\nIt is hereby declared and agreed that Ayurvedic Treatment is\ncovered upto Sum Insured, subject to and for treatment taken as\ninpatient in a government hospital or in any institute recognised by\ngovernment and/or accredited by Quality Council of India/\nNational Accreditation Board on Health. The hospitalisation\nshould be for a minimum period of 24 hours for being eligible for\nthe reimbursement.\nAll other terms and conditions under the policy remain unaltered."
+    },
+    {
+        "faiss_id": 283,
+        "clause_id": "18",
+        "parent_id": null,
+        "text": "18. Coverage for Homeopathic and Unani system of medicine:\nIt is hereby declared and agreed that Homeopathy and Unani\nTreatment cover is covered upto Sum Insured, subject to and for\ntreatment taken as inpatient in a government hospital or in any\ninstitute recognised by government and/or accredited by Quality\nCouncil of India/National Accreditation Board on Health. The\nhospitalisation should be for a minimum period of 24 hours for\nbeing eligible for the reimbursement.\nAll other terms and conditions under the policy remain unaltered."
+    },
+    {
+        "faiss_id": 284,
+        "clause_id": "19",
+        "parent_id": null,
+        "text": "19. Exclusion of Domiciliary Hospitalisation:\nIt is hereby declared and agreed that notwithstanding anything to\nthe contrary contained in the within written policy, the coverage\nunder this policy shall exclude any expenses for Domiciliary\nHospitalisation. Subject otherwise to the terms and conditions of\nthis policy.\nAll other terms and conditions under the policy remain unaltered."
+    },
+    {
+        "faiss_id": 285,
+        "clause_id": "20",
+        "parent_id": null,
+        "text": "20. Exclusion of Pre and Post Hospitalisation cover:\nIt is hereby declared and agreed that notwithstanding anything to\nthe contrary contained in the within written policy, the coverage\nunder this policy shall exclude the expenses arising out of Pre &\nPost Hospitalisation. Subject otherwise to the terms and\nconditions of this policy.\nAll other terms and conditions under the policy remain unaltered."
+    },
+    {
+        "faiss_id": 286,
+        "clause_id": "21",
+        "parent_id": null,
+        "text": "21. Coverage for Out Patient Treatment:\nIt is hereby declared and agreed that We will cover Outpatient\nTreatment for the Insured Person, provided that\ni. Our maximum liability under this Endorsement for\nreimbursement of expenses will be limited to a maximum of\n2% of the sum insured during the entire policy period. Subject\notherwise to the terms and conditions of this policy\nAll other terms and conditions under the policy remain\nunaltered."
+    },
+    {
+        "faiss_id": 287,
+        "clause_id": "22",
+        "parent_id": null,
+        "text": "22. Coverage for Dental Expenses:\nIt is hereby declared and agreed that We will pay/reimburse the\nReasonable and Customary charges of any necessary dental\ntreatment during the Policy Period taken from a dentist by an\nInsured Person and Exclusion No.13 stands deleted for all Insured\nPersons to this extent, provided that:\ni. We will only pay for X-rays, extractions, amalgam or composite\nfillings, root canal treatments and prescribed drugs for the\nsame, and\nii. We will not pay for any dental treatment that comprises\ncosmetic surgery, dentures, dental prosthesis, dental\nimplants, orthodontics, orthognathic surgery, jaw alignment\nPAGE 19\nand lower jaw bone surgery and surgery related to the\ntemporomandibular (jaw) unless necessitated by an acute\ntraumatic injury or cancer, and\niii. Our maximum liability under this Endorsement will be limited\na maximum reimbursement of 2% of the sum insured for the\nentire policy period.\nAll other terms and conditions under the policy remain\nunaltered."
+    },
+    {
+        "faiss_id": 288,
+        "clause_id": "23",
+        "parent_id": null,
+        "text": "23. Corporate Buffer (Additional Sum Insured for the total Group):\nIt is hereby declared and agreed that an additional sum insured as\nstipulated in the schedule of the policy will be available to the\nInsured which is in addition to the basic sum insured reflected in\nthe policy schedule per person/family.\nWe will provide a Corporate Floater as stated in the Policy Schedule\nduring the Policy Period subject to the following sub limits:\na. This sum insured will be available for those insured person,\nwho have already exhausted their sum insured limit subject to\na per person limit.\nb. However, the amount is restricted to coverage as stated in the\nPolicy Schedule of each and every Illness in respect of each and\nevery Insured person or His family (if applicable).\nThe Corporate Buffer will not be available for Maternity & Non\nAllopathic Treatment / Claims. All other terms and conditions\nunder the policy remain unaltered."
+    },
+    {
+        "faiss_id": 289,
+        "clause_id": "24",
+        "parent_id": null,
+        "text": "24. Coverage for congenital internal Diseases:\nIt is hereby agreed and declared that Exclusion no: 15 under the\npolicy stands deleted. All other terms and conditions of the policy\nremain unaltered."
+    },
+    {
+        "faiss_id": 290,
+        "clause_id": "25",
+        "parent_id": null,
+        "text": "25. Voluntary Co-pay option:\nFor all admissible claims insured person shall bear % of all eligible\nand admissible claims as per terms and conditions of insurance\nand as stated in the policy schedule. All other terms and\nconditions of the policy remain unaltered."
+    },
+    {
+        "faiss_id": 291,
+        "clause_id": "26",
+        "parent_id": null,
+        "text": "26. Enhancement of Room rent sub-limits:\nIt is hereby agreed and declared that Room, Board & Nursing\nCharges as provided by the hospital/nursing home stands\n`/-\nenhanced to -------------------% of the Sum Insured max\nfor Normal Room per day and up to ----------------% of the Sum\n`/-\nInsured per day max if admitted to Intensive Care Unit.\nAll other terms and conditions of the policy remain unaltered."
+    },
+    {
+        "faiss_id": 292,
+        "clause_id": "27",
+        "parent_id": null,
+        "text": "27. Family Floater Cover:\nIt is hereby agreed and declared that this policy covers the\nPrimary Insured and his Family as defined in the policy on a Family\nFloater basis under which the Policy definition of the Sum Insured\nshall be replaced with the following:\nSum Insured:\nmeans the sum shown in the Schedule which\nrepresents Our maximum liability for any and all claims made by\nthe Primary Insured and all Dependents during the Policy Period,\nexcept where a particular benefit is expressed to be subject to its\nown limit in which case that limit, which is subject to the Sum\nInsured, represents Our maximum liability for any and all claims\nmade by the Primary Insured and all Dependents in respect of\nthat benefit."
     }
 ]

@@ -1,6 +1,5 @@
+
 # works on top of the 5 retrieved embedding
-
-
 import ollama
 
 

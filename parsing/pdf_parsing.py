@@ -4,21 +4,29 @@ from collections import defaultdict
 
 def remove_consecutive_duplicates(text):
 
-    words = text.split()
+    lines = text.split("\n")
 
-    cleaned = []
+    cleaned_lines = []
 
-    prev = None
+    for line in lines:
 
-    for word in words:
+        words = line.split()
 
-        if word != prev:
+        cleaned_words = []
 
-            cleaned.append(word)
+        prev = None
 
-        prev = word
+        for word in words:
 
-    return " ".join(cleaned)
+            if word != prev:
+
+                cleaned_words.append(word)
+
+            prev = word
+
+        cleaned_lines.append(" ".join(cleaned_words))
+
+    return "\n".join(cleaned_lines)
 
 
 def reconstruct_lines(words):
@@ -75,7 +83,17 @@ def extract_text(pdf_path):
 
                 filtered.append(w)
 
-            text = reconstruct_lines(filtered)
+            # Split words into left and right columns
+            mid_x = page.width / 2
+            left_words = [w for w in filtered if w['x0'] < mid_x]
+            right_words = [w for w in filtered if w['x0'] >= mid_x]
+
+            # Reconstruct lines for each column
+            left_text = reconstruct_lines(left_words)
+            right_text = reconstruct_lines(right_words)
+
+            # Combine columns
+            text = left_text + "\n" + right_text
 
             text = remove_consecutive_duplicates(text)
 
@@ -89,7 +107,7 @@ def extract_text(pdf_path):
 
 if __name__ == "__main__":
 
-    pdf_path = "data/raw/Actual/Bundled_Private_Car_Insurance_Policy_Wording.pdf"
+    pdf_path = "data/raw/Actual/Health.pdf"
 
     pages = extract_text(pdf_path)
 

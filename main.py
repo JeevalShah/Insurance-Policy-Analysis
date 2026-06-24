@@ -1,4 +1,4 @@
-from parsing.document_parsing import extract_text
+from parsing.pdf_parsing import extract_text
 from clause_extraction.clause_split import split_into_clauses
 
 
