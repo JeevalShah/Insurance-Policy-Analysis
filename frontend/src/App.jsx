@@ -41,6 +41,9 @@ export default function App() {
     setStage('analyzing')
     try {
       const data = await runAnalysis(sessionId)
+      const data = await runAnalysis(sessionId)
+      console.log(data) 
+      console.log(data.result)
       setResult(data.result)
       setStage('analyzed')
     } catch (err) {
@@ -76,6 +79,7 @@ export default function App() {
               larger document sets take a few minutes.
             </p>
           </div>
+          
         )}
 
         {stage === 'analyzed' && (

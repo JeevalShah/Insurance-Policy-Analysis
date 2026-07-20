@@ -22,7 +22,7 @@ export default function ImpactResults({ result }) {
       </p>
 
       {result.map((entry, i) => {
-        const directEntries = Object.entries(entry.direct)
+        const directEntries = Object.entries(entry.direct || {})
         return (
           <div className="docket-entry" style={{ animationDelay: `${i * 40}ms` }} key={entry.trigger_id}>
             <div className="docket-header">
@@ -50,7 +50,7 @@ export default function ImpactResults({ result }) {
               ))
             )}
 
-            {entry.indirect.length > 0 && (
+            {(entry.indirect || []).length > 0 && (
               <div className="indirect-footer">
                 <strong>Indirectly affected:</strong>{' '}
                 {entry.indirect.map((id) => (
