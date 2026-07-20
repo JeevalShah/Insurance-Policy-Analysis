@@ -37,7 +37,7 @@ class HierarchicalClauseExtractor:
         self.single_digit_pattern = re.compile(
             r'^(\d+)\.\s+(.*)$'
         )
-        
+
         # Override dotted pattern if custom legacy pattern is provided
         if pattern:
             self.dotted_pattern = re.compile(pattern)
@@ -61,22 +61,22 @@ class HierarchicalClauseExtractor:
 
         lines = text.split("\n")
         clauses: List[Dict[str, Optional[str]]] = []
-        
+
         current_section: Optional[str] = None
         current_subsection: Optional[str] = None
-        
+
         current_clause_id: Optional[str] = "Preamble"
         current_clause_text_lines: List[str] = []
 
         def finalize_clause(next_id: Optional[str]):
             nonlocal current_clause_id, current_clause_text_lines
             clause_text = "\n".join(current_clause_text_lines).strip()
-            
+
             # Deduce parent clause ID using dot notation
             if current_clause_id:
                 parts = current_clause_id.split(".")
                 parent_id = ".".join(parts[:-1]) if len(parts) > 2 else None
-                
+
                 if current_clause_id == "Preamble" and not clause_text:
                     pass  # Skip empty preamble
                 else:
@@ -85,7 +85,7 @@ class HierarchicalClauseExtractor:
                         "parent_id": parent_id,
                         "text": clause_text
                     })
-            
+
             current_clause_id = next_id
             current_clause_text_lines = []
 
@@ -93,7 +93,7 @@ class HierarchicalClauseExtractor:
             stripped = line.strip()
             if not stripped:
                 continue
-                
+
             # 1. Check dotted heading (e.g., Clause 1.1)
             dotted_match = self.dotted_pattern.match(stripped)
             if dotted_match:
@@ -103,7 +103,7 @@ class HierarchicalClauseExtractor:
                 finalize_clause(matched_id)
                 current_clause_text_lines.append(line)
                 continue
-                
+
             # 2. Check main section heading (e.g., 8. CONDITIONS)
             section_match = self.section_pattern.match(stripped)
             if section_match:
@@ -112,14 +112,14 @@ class HierarchicalClauseExtractor:
                 finalize_clause(current_section)
                 current_clause_text_lines.append(line)
                 continue
-                
+
             # 3. Check subsection heading (e.g., b) SECTION II)
             subsec_match = self.subsection_pattern.match(stripped)
             if subsec_match:
                 current_subsection = subsec_match.group(1).upper()
                 current_clause_text_lines.append(line)
                 continue
-                
+
             # 4. Check single digit heading (e.g., 1. Notice shall be given...)
             single_match = self.single_digit_pattern.match(stripped)
             if single_match:
@@ -136,22 +136,30 @@ class HierarchicalClauseExtractor:
                         clause_id = f"{current_section}.{num}"
                 else:
                     clause_id = num
-                    
+
                 finalize_clause(clause_id)
                 current_clause_text_lines.append(line)
                 continue
-                
+
             # Otherwise, append normal line to the active clause text
             current_clause_text_lines.append(line)
+        
 
         # Finalize the remaining text block
         finalize_clause(None)
-        
+
         # Clean up last item if empty
         if clauses and clauses[-1]["clause_id"] is None:
             clauses.pop()
-            
-        logger.info(f"Successfully extracted {len(clauses)} clauses (including preamble/fallback if applicable).")
+
+        logger.info("\nLargest extracted clauses:\n")
+        sorted_clauses = sorted(  clauses,
+    key=lambda c: len(c["text"].split()), reverse=True
+    )       
+        for c in sorted_clauses[:10]:
+           logger.info(
+        f"{c['clause_id']} -> {len(c['text'].split())} words"
+    )
         return clauses
 
 
@@ -182,7 +190,6 @@ if __name__ == "__main__":
             extractor = HierarchicalClauseExtractor()
             extracted = extractor.extract(text_data)
 
-            # Ensure output folder exists
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
             with open(output_path, "w", encoding="utf-8") as f:
@@ -190,10 +197,10 @@ if __name__ == "__main__":
 
             logger.info(f"Saved {len(extracted)} clauses to {output_path}")
 
-            # Print first few extracted clauses for debugging
             logger.info("Sample clauses:")
             for item in extracted[:3]:
                 logger.info(f"ID: {item['clause_id']} | Parent: {item['parent_id']} | Length: {len(item['text'] or '')}")
+            
         else:
             logger.error(f"Input file not found at {input_path}")
     except Exception as ex:
