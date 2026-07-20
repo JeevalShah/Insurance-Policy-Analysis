@@ -143,6 +143,7 @@ class HierarchicalClauseExtractor:
 
             # Otherwise, append normal line to the active clause text
             current_clause_text_lines.append(line)
+        
 
         # Finalize the remaining text block
         finalize_clause(None)
@@ -151,7 +152,14 @@ class HierarchicalClauseExtractor:
         if clauses and clauses[-1]["clause_id"] is None:
             clauses.pop()
 
-        logger.info(f"Successfully extracted {len(clauses)} clauses (including preamble/fallback if applicable).")
+        logger.info("\nLargest extracted clauses:\n")
+        sorted_clauses = sorted(  clauses,
+    key=lambda c: len(c["text"].split()), reverse=True
+    )       
+        for c in sorted_clauses[:10]:
+           logger.info(
+        f"{c['clause_id']} -> {len(c['text'].split())} words"
+    )
         return clauses
 
 
@@ -192,6 +200,7 @@ if __name__ == "__main__":
             logger.info("Sample clauses:")
             for item in extracted[:3]:
                 logger.info(f"ID: {item['clause_id']} | Parent: {item['parent_id']} | Length: {len(item['text'] or '')}")
+            
         else:
             logger.error(f"Input file not found at {input_path}")
     except Exception as ex:
