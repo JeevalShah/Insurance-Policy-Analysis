@@ -41,7 +41,7 @@ export default function App() {
     setStage('analyzing')
     try {
       const data = await runAnalysis(sessionId)
-      const data = await runAnalysis(sessionId)
+      // const data = await runAnalysis(sessionId)
       console.log(data) 
       console.log(data.result)
       setResult(data.result)
