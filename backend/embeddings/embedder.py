@@ -136,15 +136,23 @@ class PolicyEmbedder:
                     continue
 
                 distance = float(distances[0][i])
-                if distance <= distance_threshold:
-                    clause_info = clauses[idx]
-                    results.append({
-                        "faiss_id": idx,
-                        "distance": distance,
-                        "clause_id": clause_info.get("clause_id"),
-                        "parent_id": clause_info.get("parent_id"),
-                        "text": clause_info.get("text")
-                    })
+                # if distance <= distance_threshold:
+                #     clause_info = clauses[idx]
+                #     results.append({
+                #         "faiss_id": idx,
+                #         "distance": distance,
+                #         "clause_id": clause_info.get("clause_id"),
+                #         "parent_id": clause_info.get("parent_id"),
+                #         "text": clause_info.get("text")
+                #     })
+                clause_info = clauses[idx]
+                results.append({
+                "faiss_id": idx,
+                 "distance": distance,
+                  "clause_id": clause_info.get("clause_id"),
+                  "parent_id": clause_info.get("parent_id"),
+                  "text": clause_info.get("text")
+                })
             logger.info(f"Search matched {len(results)} items within L2 threshold of {distance_threshold}.")
             return results
         except Exception as e:

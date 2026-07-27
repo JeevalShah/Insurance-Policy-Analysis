@@ -55,10 +55,11 @@ def analyze_trigger(
     """Runs direct retrieval + classification + indirect propagation for one regulatory clause."""
     retrieved = searcher.search(
     retrieval_trigger,
-    k=top_k,
+    k=5,#top_k
     distance_threshold=distance_threshold,
 )
-
+    
+    print(f"Retrieved {len(retrieved)} clauses")
     direct_impacts: Dict[str, Any] = {}
     for r in retrieved:
         clause = r["clause"]
@@ -93,12 +94,18 @@ def analyze_trigger(
         data["relationship"] = relationship
         data["reasoning"] = reasoning
 
-    indirect_impacts = get_indirect_impacts(list(direct_impacts.keys()), dependency_graph)
+    indirect_impacts = sorted(
+    get_indirect_impacts(
+        list(direct_impacts.keys()),
+        dependency_graph,
+    ))
 
     return {
     "trigger_id": trigger_id,
-    "trigger_text": original_trigger,
-    "retrieval_query": retrieval_trigger,
+    "trigger_text": original_trigger,       # original clause
+    "retrieval_query": retrieval_trigger,   # summarized clause
+    "direct": direct_impacts,
+    "indirect": sorted(indirect_impacts),
     }
 
 
@@ -107,7 +114,7 @@ def analyze_impact(
     policy_clauses: List[Dict[str, Any]],
     searcher,
     top_k: int = 5,
-    distance_threshold: float = 1.0,
+    distance_threshold: float = 5.0,
     chat_model: str = "llama3",
 ) -> List[Dict[str, Any]]:
     """
