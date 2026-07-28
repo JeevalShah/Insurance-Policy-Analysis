@@ -63,19 +63,27 @@ def chat(session: SessionState, user_message: str) -> Dict[str, Any]:
     context_block = _format_context(retrieved)
     analysis_block = _format_analysis_summary(session)
 
-    history = session.chat_history[-(config.MAX_CHAT_HISTORY_TURNS * 2):]
+    # Prevent potential errors if the history is empty
+    history = session.chat_history[-(config.MAX_CHAT_HISTORY_TURNS * 2):] if session.chat_history else []
 
+    # 1. Base system instructions
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-    messages.append({
-        "role": "system",
-        "content": f"Prior impact analysis summary:\n{analysis_block}"
-    })
-    messages.append({
-        "role": "system",
-        "content": f"Retrieved policy clauses relevant to the current question:\n{context_block}"
-    })
+    
+    # 2. Add conversational history FIRST
     messages.extend(history)
-    messages.append({"role": "user", "content": user_message})
+    
+    # 3. Create a unified prompt combining context and the user's question LAST
+    # This ensures the model's immediate attention is on the facts.
+    augmented_user_message = (
+        f"Context for this question:\n"
+        f"---\n"
+        f"Prior impact analysis summary:\n{analysis_block}\n\n"
+        f"Retrieved policy clauses:\n{context_block}\n"
+        f"---\n\n"
+        f"User Question: {user_message}"
+    )
+    
+    messages.append({"role": "user", "content": augmented_user_message})
 
     try:
         response = ollama.chat(model=config.CHAT_MODEL, messages=messages)
@@ -84,6 +92,8 @@ def chat(session: SessionState, user_message: str) -> Dict[str, Any]:
         logger.error(f"Chat generation failed: {e}")
         raise RuntimeError("The local language model could not be reached. Is Ollama running?") from e
 
+    # IMPORTANT: Save the ORIGINAL user_message to history, not the augmented one!
+    # If you save the augmented one, your history will fill up with duplicate contexts.
     session.chat_history.append({"role": "user", "content": user_message})
     session.chat_history.append({"role": "assistant", "content": answer})
 

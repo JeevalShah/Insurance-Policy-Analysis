@@ -105,6 +105,9 @@ def run_analysis(session: SessionState) -> List[dict]:
     if session.status not in ("ready", "analyzed"):
         raise ValueError(f"Session is not ready for analysis (status={session.status}).")
 
+    if session.status == "analyzed" and session.analysis_result is not None:
+        return session.analysis_result
+    
     session.status = "analyzing"
     try:
         searcher = SemanticSearch(session.index, session.policy_clauses, embedder=session.embedder)

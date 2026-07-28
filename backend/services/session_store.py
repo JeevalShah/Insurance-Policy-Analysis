@@ -6,7 +6,6 @@ from typing import Any, Dict, List, Optional
 
 import config
 
-
 @dataclass
 class SessionState:
     session_id: str
@@ -21,7 +20,17 @@ class SessionState:
     embedder: Any = None              # embeddings.embedder.PolicyEmbedder
 
     analysis_result: Optional[List[Dict[str, Any]]] = None
+    
+    # Stores the conversational memory
     chat_history: List[Dict[str, str]] = field(default_factory=list)
+
+    def add_chat_message(self, role: str, content: str):
+        """Helper to append a message to the memory."""
+        self.chat_history.append({"role": role, "content": content})
+
+    def get_recent_chat_history(self, limit: int = 6) -> List[Dict[str, str]]:
+        """Returns only the most recent N messages to prevent context window overflow."""
+        return self.chat_history[-limit:] if self.chat_history else []
 
 
 class SessionStore:
@@ -53,7 +62,5 @@ class SessionStore:
         return state
 
 
-# Single process-wide store. For production, this would be swapped for a
-# real cache/DB, but in-memory is sufficient for a single-worker Flask
-# dev/prototype deployment.
+# Single process-wide store.
 store = SessionStore()
