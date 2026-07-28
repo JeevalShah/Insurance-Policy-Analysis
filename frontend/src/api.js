@@ -24,6 +24,11 @@ export async function runAnalysis(sessionId) {
   return data
 }
 
+export async function getSessionStatus(sessionId) {
+  const { data } = await client.get(`/session/${sessionId}`)
+  return data
+}
+
 export async function sendChatMessage(sessionId, message) {
   const { data } = await client.post('/chat', { session_id: sessionId, message })
   return data
