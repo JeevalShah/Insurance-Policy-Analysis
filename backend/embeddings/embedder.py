@@ -125,36 +125,37 @@ class PolicyEmbedder:
     ) -> List[Dict[str, Any]]:
         try:
             query_vector = np.array(query_vector, dtype="float32")
+
             if len(query_vector.shape) == 1:
                 query_vector = np.expand_dims(query_vector, axis=0)
 
             distances, indices = index.search(query_vector, k)
 
             results = []
+
             for i, idx in enumerate(indices[0]):
+
                 if idx == -1 or idx >= len(clauses):
                     continue
 
                 distance = float(distances[0][i])
-                # if distance <= distance_threshold:
-                #     clause_info = clauses[idx]
-                #     results.append({
-                #         "faiss_id": idx,
-                #         "distance": distance,
-                #         "clause_id": clause_info.get("clause_id"),
-                #         "parent_id": clause_info.get("parent_id"),
-                #         "text": clause_info.get("text")
-                #     })
                 clause_info = clauses[idx]
+
                 results.append({
-                "faiss_id": idx,
-                 "distance": distance,
-                  "clause_id": clause_info.get("clause_id"),
-                  "parent_id": clause_info.get("parent_id"),
-                  "text": clause_info.get("text")
+                    "faiss_id": idx,
+                    "distance": distance,
+                    "clause_id": clause_info.get("clause_id"),
+                    "parent_id": clause_info.get("parent_id"),
+                    "text": clause_info.get("text")
                 })
-            logger.info(f"Search matched {len(results)} items within L2 threshold of {distance_threshold}.")
+
+            logger.info(
+                f"Search returned {len(results)} nearest clauses. "
+                f"Distances: {[r['distance'] for r in results]}"
+            )
+
             return results
+
         except Exception as e:
             logger.error(f"Error occurred during secure_search: {e}")
             return []
