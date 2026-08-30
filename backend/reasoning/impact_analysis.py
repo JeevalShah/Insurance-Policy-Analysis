@@ -55,7 +55,7 @@ def analyze_trigger(
     """Runs direct retrieval + classification + indirect propagation for one regulatory clause."""
     retrieved = searcher.search(
     retrieval_trigger,
-    k=5,#top_k
+    k=top_k,
     distance_threshold=distance_threshold,
 )
     
