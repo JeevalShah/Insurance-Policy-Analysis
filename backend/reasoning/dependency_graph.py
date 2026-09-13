@@ -11,6 +11,7 @@ graph misses a real operational relationship.
 import re
 import logging
 from typing import Dict, List, Set, Any
+from reasoning.graph_store import policy_graph
 
 logger = logging.getLogger("DependencyGraph")
 
@@ -57,6 +58,7 @@ def build_dependency_graph(clauses: List[Dict[str, Any]]) -> Dict[str, List[str]
 
     result = {k: sorted(v) for k, v in graph.items()}
     logger.info(f"Built dependency graph with {len(result)} source clauses.")
+    build_falkordb_graph(clauses, result)    
     return result
 
 
@@ -85,3 +87,21 @@ def get_indirect_impacts(
         frontier = next_frontier
 
     return indirect
+
+def build_falkordb_graph(clauses, dependencies):
+    """Inserts policy clauses and their dependencies into FalkorDB."""
+    for clause in clauses:
+        policy_graph.query(
+            "MERGE (c:PolicyClause {id: $id}) SET c.text = $text",
+            {"id": clause["clause_id"], "text": clause["text"]}
+        )
+    
+    for source, targets in dependencies.items():
+        for target in targets:
+            policy_graph.query(
+                """
+                MATCH (s:PolicyClause {id: $source}), (t:PolicyClause {id: $target})
+                MERGE (s)-[:DEPENDS_ON]->(t)
+                """,
+                {"source": source, "target": target}
+            )

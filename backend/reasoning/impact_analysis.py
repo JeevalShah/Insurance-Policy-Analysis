@@ -2,17 +2,15 @@ import logging
 from typing import Any, Dict, List
 
 from reasoning.relationshipclassifier import classify_relationship
-from reasoning.dependency_graph import build_dependency_graph, get_indirect_impacts
+from reasoning.dependency_graph import build_dependency_graph
 import ollama 
-
+from reasoning.graph_store import policy_graph
 
 logger = logging.getLogger("ImpactAnalysis")
 
 
 def generate_reasoning(trigger: str, clause_text: str, relationship: str, model: str = "llama3") -> str:
     """LLM-generated 1-2 sentence explanation of why a relationship holds."""
-    import ollama
-
     prompt = f"""You are an insurance compliance analyst.
 
 Regulatory Trigger:
@@ -42,22 +40,48 @@ Maximum 50 words."""
         return "Reasoning unavailable: the local language model could not be reached."
 
 
+def save_compliance_relation(reg_id: str, reg_text: str, clause_id: str, relationship: str, reasoning: str):
+    """Creates a relationship edge based on the Llama 3 classification."""
+    policy_graph.query(
+        """
+        MERGE (r:Regulation {id: $reg_id})
+        SET r.text = $reg_text
+        MATCH (c:PolicyClause {id: $clause_id})
+        MERGE (r)-[rel:COMPLIANCE {status: $status, reasoning: $reasoning}]->(c)
+        """,
+        {"reg_id": reg_id, "reg_text": reg_text, "clause_id": clause_id, "status": relationship, "reasoning": reasoning}
+    )
+
+
+def get_graph_impacts(reg_id: str) -> List[str]:
+    """Retrieves indirect impacts natively from the graph using Cypher."""
+    query = """
+    MATCH (r:Regulation {id: $reg_id})-[rel:COMPLIANCE]->(direct:PolicyClause)
+    OPTIONAL MATCH (direct)-[:DEPENDS_ON*1..3]->(indirect:PolicyClause)
+    RETURN collect(DISTINCT indirect.id) as indirect_impacts
+    """
+    result = policy_graph.query(query, {"reg_id": reg_id}).result_set
+    if result and len(result) > 0 and result[0][0]:
+         # Filter out None values just in case there are no indirect impacts
+         return sorted([impact for impact in result[0][0] if impact is not None])
+    return []
+
+
 def analyze_trigger(
     trigger_id: str,
     original_trigger: str,
     retrieval_trigger: str,
     searcher,
-    dependency_graph,
     top_k,
     distance_threshold,
     chat_model,
 ):
     """Runs direct retrieval + classification + indirect propagation for one regulatory clause."""
     retrieved = searcher.search(
-    retrieval_trigger,
-    k=top_k,
-    distance_threshold=distance_threshold,
-)
+        retrieval_trigger,
+        k=top_k,
+        distance_threshold=distance_threshold,
+    )
     
     print(f"Retrieved {len(retrieved)} clauses")
     direct_impacts: Dict[str, Any] = {}
@@ -70,42 +94,36 @@ def analyze_trigger(
         }
 
     for clause_id, data in direct_impacts.items():
-        
         print("Starting relationship classification...")
-
         relationship = classify_relationship(
-    original_trigger,
-    data["text"],
-    model=chat_model
-)
-
+            original_trigger,
+            data["text"],
+            model=chat_model
+        )
         print("Relationship done")
 
         print("Starting reasoning...")
-
         reasoning = generate_reasoning(
-    original_trigger,
-    data["text"],
-    relationship,
-    model=chat_model)
-
+            original_trigger,
+            data["text"],
+            relationship,
+            model=chat_model
+        )
         print("Reasoning done")
 
         data["relationship"] = relationship
         data["reasoning"] = reasoning
 
-    indirect_impacts = sorted(
-    get_indirect_impacts(
-        list(direct_impacts.keys()),
-        dependency_graph,
-    ))
+        save_compliance_relation(trigger_id, original_trigger, clause_id, relationship, reasoning)
+
+    indirect_impacts = get_graph_impacts(trigger_id)
 
     return {
-    "trigger_id": trigger_id,
-    "trigger_text": original_trigger,       # original clause
-    "retrieval_query": retrieval_trigger,   # summarized clause
-    "direct": direct_impacts,
-    "indirect": sorted(indirect_impacts),
+        "trigger_id": trigger_id,
+        "trigger_text": original_trigger,       # original clause
+        "retrieval_query": retrieval_trigger,   # summarized clause
+        "direct": direct_impacts,
+        "indirect": indirect_impacts,
     }
 
 
@@ -117,59 +135,36 @@ def analyze_impact(
     distance_threshold: float = 5.0,
     chat_model: str = "llama3",
 ) -> List[Dict[str, Any]]:
-    """
-    Runs the full impact analysis: each regulation clause becomes a
-    regulatory trigger, searched against the policy index, classified, and
-    propagated through the auto-built dependency graph.
+    
 
-    Args:
-        regulation_clauses: structured clauses extracted from the regulation doc.
-        policy_clauses: structured clauses extracted from the company policy doc(s),
-            i.e. the corpus that was embedded and indexed.
-        searcher: a retrieval.semanticsearch.SemanticSearch bound to the policy index.
-
-    Returns:
-        List of per-regulation-clause impact analysis results.
-    """
-    dependency_graph = build_dependency_graph(policy_clauses)
+    build_dependency_graph(policy_clauses)
 
     results = []
     for reg_clause in regulation_clauses:
         original_trigger = (reg_clause.get("text") or "").strip()
-        trigger_text = prepare_trigger(
-    original_trigger,
-    model=chat_model
-)
-        print("-" * 80)
-        print(reg_clause.get("clause_id"))
-        print(len(trigger_text.split()))
-        print("-" * 80)
+        trigger_text = prepare_trigger(original_trigger, model=chat_model)
+        
         trigger_id = reg_clause.get("clause_id", "Preamble")
-        # trigger_text = (reg_clause.get("text") or "").strip()
         if not trigger_text:
             continue
 
         result = analyze_trigger(
-    trigger_id,
-    original_trigger,
-    trigger_text,          # summarized version
-    searcher,
-    dependency_graph,
-    top_k,
-    distance_threshold,
-    chat_model,
-)
+            trigger_id,
+            original_trigger,
+            trigger_text,
+            searcher,
+            top_k,
+            distance_threshold,
+            chat_model,
+        )
         results.append(result)
 
     logger.info(f"Completed impact analysis for {len(results)} regulatory clauses.")
     return results
 
-#helper function for summarizing clauses.
 MAX_QUERY_WORDS = 350
 
-
 def prepare_trigger(text, model="llama3"):
-
     if len(text.split()) <= MAX_QUERY_WORDS:
         return text
 
@@ -186,10 +181,8 @@ Requirements:
 
 {text}
 """
-
     response = ollama.chat(
         model=model,
         messages=[{"role":"user","content":prompt}]
     )
-
     return response["message"]["content"].strip()

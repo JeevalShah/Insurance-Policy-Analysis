@@ -9,3 +9,4 @@ numpy
 python-docx
 scikit-learn
 ollama
+falkordb
