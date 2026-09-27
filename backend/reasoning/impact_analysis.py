@@ -1,188 +1,267 @@
-import logging
-from typing import Any, Dict, List
+"""
+impact_analysis.py
 
-from reasoning.relationshipclassifier import classify_relationship
-from reasoning.dependency_graph import build_dependency_graph
-import ollama 
-from reasoning.graph_store import policy_graph
+At query time this file makes ZERO LLM calls and ZERO FAISS searches.
+All classification and reasoning happened at ingestion time and is stored
+as edges in Neo4j.
+
+This file only:
+  1. Reads specific compliance edges for each regulatory clause (direct impacts)
+  2. Traverses DEPENDS_ON chains from those clauses             (indirect impacts)
+  3. Assembles the aggregate compliance summary
+"""
+
+import logging
+from typing import Any, Dict, List, Optional
+
+from reasoning.graph_store import (
+    driver,
+    NODE_REGULATORY,
+    NODE_POLICY,
+    EDGE_DEPENDS_ON,
+    REL_NOT_RELATED,
+)
 
 logger = logging.getLogger("ImpactAnalysis")
 
 
-def generate_reasoning(trigger: str, clause_text: str, relationship: str, model: str = "llama3") -> str:
-    """LLM-generated 1-2 sentence explanation of why a relationship holds."""
-    prompt = f"""You are an insurance compliance analyst.
+# Map specific Neo4j edge types back to the human-readable relationship label
+# expected by the frontend UI and chat service
+REL_TYPE_TO_LABEL = {
+    "CONFLICTS_WITH": "CONFLICT",
+    "COMPLIES_WITH":  "COMPLIANT",
+    "SUPPORTS":       "SUPPORTING",
+    "IS_REDUNDANT":   "REDUNDANT",
+    "NOT_RELATED":    "NOT_RELATED"
+}
 
-Regulatory Trigger:
-{trigger}
 
-Retrieved Clause:
-{clause_text}
+# ---------------------------------------------------------------------------
+# Direct impacts — read specific compliance edges written at ingestion time
+# ---------------------------------------------------------------------------
 
-Relationship Classification:
-{relationship}
-
-Explain in 1-2 concise sentences why this relationship exists.
-Do not speculate. Base your answer only on the trigger and clause.
-Maximum 50 words."""
+def get_direct_impacts(
+    reg_clause_id: str,
+    session_id: str,
+    exclude_types: Optional[List[str]] = None,
+) -> Dict[str, Any]:
+    if exclude_types is None:
+        exclude_types = [REL_NOT_RELATED]
 
     try:
-        print("="*60)
-        print(f"Clause length: {len(clause_text.split())} words")
-        print("="*60)
-        response = ollama.chat(
-            model=model,
-            messages=[{"role": "user", "content": prompt}]
-        )
-        return response["message"]["content"].strip()
+        with driver.session() as session:
+            result = session.run(
+                f"""
+                MATCH (r:{NODE_REGULATORY} {{id: $rid, session_id: $sid}})
+                      -[e]->
+                      (p:{NODE_POLICY})
+                WHERE NOT type(e) IN $exclude AND NOT type(e) = $dep_edge
+                RETURN p.id            AS clause_id,
+                       p.text          AS text,
+                       p.section       AS section,
+                       type(e)         AS rel_type,
+                       e.reasoning     AS reasoning,
+                       e.confidence    AS confidence,
+                       e.classified_at AS classified_at
+                ORDER BY rel_type, p.id
+                """,
+                {
+                    "rid":      reg_clause_id,
+                    "sid":      session_id,
+                    "exclude":  exclude_types,
+                    "dep_edge": EDGE_DEPENDS_ON,
+                }
+            )
+
+            impacts: Dict[str, Any] = {}
+            for record in result:
+                data = record.data()
+                clause_id = data.get("clause_id")
+                rel_type  = data.get("rel_type", "NOT_RELATED")
+                relationship_label = REL_TYPE_TO_LABEL.get(rel_type, rel_type)
+
+                if clause_id:
+                    impacts[clause_id] = {
+                        "text":          data.get("text", ""),
+                        "section":       data.get("section", ""),
+                        "relationship":  relationship_label,
+                        "reasoning":     data.get("reasoning", ""),
+                        "confidence":    data.get("confidence"),
+                        "classified_at": data.get("classified_at"),
+                    }
+
+        logger.debug(f"Direct impacts for {reg_clause_id}: {len(impacts)} clauses")
+        return impacts
+
     except Exception as e:
-        logger.error(f"Reasoning generation failed: {e}")
-        return "Reasoning unavailable: the local language model could not be reached."
+        logger.error(f"get_direct_impacts failed for {reg_clause_id}: {e}")
+        return {}
 
 
-def save_compliance_relation(reg_id: str, reg_text: str, clause_id: str, relationship: str, reasoning: str):
-    """Creates a relationship edge based on the Llama 3 classification."""
-    policy_graph.query(
-        """
-        MERGE (r:Regulation {id: $reg_id})
-        SET r.text = $reg_text
-        MATCH (c:PolicyClause {id: $clause_id})
-        MERGE (r)-[rel:COMPLIANCE {status: $status, reasoning: $reasoning}]->(c)
-        """,
-        {"reg_id": reg_id, "reg_text": reg_text, "clause_id": clause_id, "status": relationship, "reasoning": reasoning}
-    )
+# ---------------------------------------------------------------------------
+# Indirect impacts — traverse DEPENDS_ON chains from directly impacted clauses
+# ---------------------------------------------------------------------------
+
+def get_indirect_impacts(
+    reg_clause_id: str,
+    session_id: str,
+    max_hops: int = 3,
+) -> List[Dict[str, Any]]:
+    try:
+        with driver.session() as session:
+            result = session.run(
+                f"""
+                MATCH (r:{NODE_REGULATORY} {{id: $rid, session_id: $sid}})
+                      -[e:CONFLICTS_WITH|COMPLIES_WITH|SUPPORTS]->
+                      (direct:{NODE_POLICY})
+                WITH collect(DISTINCT direct) AS direct_nodes
+
+                UNWIND direct_nodes AS direct
+                MATCH path = (direct)-[:{EDGE_DEPENDS_ON}*1..{max_hops}]->(indirect:{NODE_POLICY})
+                WHERE NOT indirect IN direct_nodes
+
+                RETURN DISTINCT
+                       indirect.id      AS clause_id,
+                       indirect.text    AS text,
+                       indirect.section AS section,
+                       length(path)     AS hop_count,
+                       direct.id        AS triggered_by
+                ORDER BY hop_count, indirect.id
+                """,
+                {
+                    "rid": reg_clause_id,
+                    "sid": session_id,
+                }
+            )
+
+            indirect: List[Dict[str, Any]] = []
+            for record in result:
+                data = record.data()
+                indirect.append({
+                    "clause_id":    data.get("clause_id"),
+                    "text":         data.get("text", ""),
+                    "section":      data.get("section", ""),
+                    "relationship": "INDIRECT",
+                    "hop_count":    data.get("hop_count"),
+                    "triggered_by": data.get("triggered_by"),
+                })
+
+        return indirect
+
+    except Exception as e:
+        logger.error(f"get_indirect_impacts failed for {reg_clause_id}: {e}")
+        return []
 
 
-def get_graph_impacts(reg_id: str) -> List[str]:
-    """Retrieves indirect impacts natively from the graph using Cypher."""
-    query = """
-    MATCH (r:Regulation {id: $reg_id})-[rel:COMPLIANCE]->(direct:PolicyClause)
-    OPTIONAL MATCH (direct)-[:DEPENDS_ON*1..3]->(indirect:PolicyClause)
-    RETURN collect(DISTINCT indirect.id) as indirect_impacts
-    """
-    result = policy_graph.query(query, {"reg_id": reg_id}).result_set
-    if result and len(result) > 0 and result[0][0]:
-         # Filter out None values just in case there are no indirect impacts
-         return sorted([impact for impact in result[0][0] if impact is not None])
-    return []
+# ---------------------------------------------------------------------------
+# Compliance summary — aggregate stats for reporting / paper
+# ---------------------------------------------------------------------------
 
+def get_compliance_summary(session_id: str) -> Dict[str, Any]:
+    try:
+        with driver.session() as session:
+            # Distribution of relationship types
+            dist_res = session.run(
+                f"""
+                MATCH (r:{NODE_REGULATORY} {{session_id: $sid}})
+                      -[e]->
+                      (p:{NODE_POLICY})
+                WHERE NOT type(e) = $dep_edge
+                RETURN type(e) AS rel_type, count(*) AS count
+                ORDER BY count DESC
+                """,
+                {"sid": session_id, "dep_edge": EDGE_DEPENDS_ON}
+            )
+            label_dist = {
+                REL_TYPE_TO_LABEL.get(rec["rel_type"], rec["rel_type"]): rec["count"]
+                for rec in dist_res
+            }
 
-def analyze_trigger(
-    trigger_id: str,
-    original_trigger: str,
-    retrieval_trigger: str,
-    searcher,
-    top_k,
-    distance_threshold,
-    chat_model,
-):
-    """Runs direct retrieval + classification + indirect propagation for one regulatory clause."""
-    retrieved = searcher.search(
-        retrieval_trigger,
-        k=top_k,
-        distance_threshold=distance_threshold,
-    )
-    
-    print(f"Retrieved {len(retrieved)} clauses")
-    direct_impacts: Dict[str, Any] = {}
-    for r in retrieved:
-        clause = r["clause"]
-        clause_id = clause["clause_id"]
-        direct_impacts[clause_id] = {
-            "text": clause["text"],
-            "distance": r["distance"],
+            # Conflicts list
+            conflict_res = session.run(
+                f"""
+                MATCH (r:{NODE_REGULATORY} {{session_id: $sid}})
+                      -[e:CONFLICTS_WITH]->
+                      (p:{NODE_POLICY})
+                RETURN r.id        AS reg_id,
+                       r.section   AS reg_section,
+                       p.id        AS pol_id,
+                       p.section   AS pol_section,
+                       e.reasoning AS reasoning,
+                       e.confidence AS confidence
+                ORDER BY r.id, p.id
+                """,
+                {"sid": session_id}
+            )
+            conflict_pairs = [rec.data() for rec in conflict_res]
+
+            # Unmatched policy clauses
+            unmatched_res = session.run(
+                f"""
+                MATCH (p:{NODE_POLICY} {{session_id: $sid}})
+                WHERE NOT (:{NODE_REGULATORY})-[]->(p)
+                RETURN p.id AS clause_id, p.section AS section
+                ORDER BY p.id
+                """,
+                {"sid": session_id}
+            )
+            unmatched = [rec.data() for rec in unmatched_res]
+
+            # Counts
+            reg_count = session.run(
+                f"MATCH (r:{NODE_REGULATORY} {{session_id: $sid}}) RETURN count(r) AS c",
+                {"sid": session_id}
+            ).single()["c"]
+
+            pol_count = session.run(
+                f"MATCH (p:{NODE_POLICY} {{session_id: $sid}}) RETURN count(p) AS c",
+                {"sid": session_id}
+            ).single()["c"]
+
+        return {
+            "total_regulatory_clauses": reg_count,
+            "total_policy_clauses":     pol_count,
+            "label_distribution":       label_dist,
+            "conflict_pairs":           conflict_pairs,
+            "unmatched_policy_clauses": unmatched,
         }
 
-    for clause_id, data in direct_impacts.items():
-        print("Starting relationship classification...")
-        relationship = classify_relationship(
-            original_trigger,
-            data["text"],
-            model=chat_model
-        )
-        print("Relationship done")
+    except Exception as e:
+        logger.error(f"get_compliance_summary failed: {e}")
+        return {}
 
-        print("Starting reasoning...")
-        reasoning = generate_reasoning(
-            original_trigger,
-            data["text"],
-            relationship,
-            model=chat_model
-        )
-        print("Reasoning done")
 
-        data["relationship"] = relationship
-        data["reasoning"] = reasoning
-
-        save_compliance_relation(trigger_id, original_trigger, clause_id, relationship, reasoning)
-
-    indirect_impacts = get_graph_impacts(trigger_id)
-
-    return {
-        "trigger_id": trigger_id,
-        "trigger_text": original_trigger,       # original clause
-        "retrieval_query": retrieval_trigger,   # summarized clause
-        "direct": direct_impacts,
-        "indirect": indirect_impacts,
-    }
-
+# ---------------------------------------------------------------------------
+# Main entry point
+# ---------------------------------------------------------------------------
 
 def analyze_impact(
+    session_id: str,
     regulation_clauses: List[Dict[str, Any]],
-    policy_clauses: List[Dict[str, Any]],
-    searcher,
-    top_k: int = 5,
-    distance_threshold: float = 5.0,
-    chat_model: str = "llama3",
+    max_hops: int = 3,
+    exclude_types: Optional[List[str]] = None,
 ) -> List[Dict[str, Any]]:
-    
+    results: List[Dict[str, Any]] = []
 
-    build_dependency_graph(policy_clauses)
-
-    results = []
     for reg_clause in regulation_clauses:
-        original_trigger = (reg_clause.get("text") or "").strip()
-        trigger_text = prepare_trigger(original_trigger, model=chat_model)
-        
-        trigger_id = reg_clause.get("clause_id", "Preamble")
-        if not trigger_text:
+        reg_id   = reg_clause.get("clause_id", "")
+        reg_text = (reg_clause.get("text") or "").strip()
+
+        if not reg_id or not reg_text:
             continue
 
-        result = analyze_trigger(
-            trigger_id,
-            original_trigger,
-            trigger_text,
-            searcher,
-            top_k,
-            distance_threshold,
-            chat_model,
-        )
-        results.append(result)
+        direct   = get_direct_impacts(reg_id, session_id, exclude_types)
+        indirect = get_indirect_impacts(reg_id, session_id, max_hops)
 
-    logger.info(f"Completed impact analysis for {len(results)} regulatory clauses.")
-    return results
+        results.append({
+            "trigger_id":   reg_id,
+            "trigger_text": reg_text,
+            "direct":       direct,
+            "indirect":     indirect,
+        })
 
-MAX_QUERY_WORDS = 350
-
-def prepare_trigger(text, model="llama3"):
-    if len(text.split()) <= MAX_QUERY_WORDS:
-        return text
-
-    prompt = f"""
-Summarize the following insurance regulation.
-
-Requirements:
-- Preserve all obligations.
-- Preserve percentages.
-- Preserve dates.
-- Preserve monetary values.
-- Preserve legal meaning.
-- Maximum 200 words.
-
-{text}
-"""
-    response = ollama.chat(
-        model=model,
-        messages=[{"role":"user","content":prompt}]
+    logger.info(
+        f"analyze_impact: {len(results)} regulatory clauses processed "
+        f"for session={session_id} — 0 LLM calls, 0 FAISS searches"
     )
-    return response["message"]["content"].strip()
+    return results

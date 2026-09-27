@@ -1,0 +1,326 @@
+{
+  "directed": true,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "label": "RC-2026-01_WaterDamage.txt",
+      "type": "RuleChange",
+      "text": "\n        RULE CHANGE NOTICE RC-2026-01 (WATER DAMAGE):\n        Pursuant to Section 12.1 and Clause 4.2, all residential and commercial property water damage claims require mandatory quarterly inspection reports.\n        Payout limits for structural flooding are capped at $50,000 max. Any claims without quarterly inspection logs shall be rejected.\n        ",
+      "filename": "RC-2026-01_WaterDamage.txt",
+      "effective_date": "2026-01-15",
+      "impact_rating": "High",
+      "risk_level": "N/A",
+      "id": "RuleChange:RC-2026-01_WaterDamage.txt"
+    },
+    {
+      "label": "RC-2026-02_AutoTowing.txt",
+      "type": "RuleChange",
+      "text": "\n        RULE CHANGE NOTICE RC-2026-02 (AUTO TOWING CAPS):\n        Under Section 8.1, roadside recovery and emergency towing reimbursements are strictly capped at $100 per incident.\n        Third-party unauthorized towing services are strictly non-compliant and non-reimbursable under revised underwriting guidelines.\n        ",
+      "filename": "RC-2026-02_AutoTowing.txt",
+      "effective_date": "2026-02-01",
+      "impact_rating": "Medium",
+      "risk_level": "N/A",
+      "id": "RuleChange:RC-2026-02_AutoTowing.txt"
+    },
+    {
+      "label": "RC-2026-03_CyberMFA.txt",
+      "type": "RuleChange",
+      "text": "\n        RULE CHANGE NOTICE RC-2026-03 (CYBER SECURITY HARDENING):\n        Referencing Paragraph 15.3, cyber liability coverage requires mandatory hardware-token multi-factor authentication (MFA) on administrator endpoints.\n        Bi-annual third-party penetration testing reports must be submitted to underwriters annually.\n        ",
+      "filename": "RC-2026-03_CyberMFA.txt",
+      "effective_date": "2026-03-01",
+      "impact_rating": "Critical",
+      "risk_level": "N/A",
+      "id": "RuleChange:RC-2026-03_CyberMFA.txt"
+    },
+    {
+      "label": "RC-2026-04_HealthPreExisting.txt",
+      "type": "RuleChange",
+      "text": "\n        RULE CHANGE NOTICE RC-2026-04 (PRE-EXISTING WAITING PERIODS):\n        Amendment to Clause 9.4: The initial waiting period for pre-existing cardiovascular conditions is reduced from 24 months to 12 months.\n        Co-pay percentages remain static at 15% across network hospitals.\n        ",
+      "filename": "RC-2026-04_HealthPreExisting.txt",
+      "effective_date": "2026-04-10",
+      "impact_rating": "Medium",
+      "risk_level": "N/A",
+      "id": "RuleChange:RC-2026-04_HealthPreExisting.txt"
+    },
+    {
+      "label": "RC-2026-05_RoofDepreciation.txt",
+      "type": "RuleChange",
+      "text": "\n        RULE CHANGE NOTICE RC-2026-05 (ROOF AGE DEPRECIATION):\n        Modifying Section 12.1 and Article 7: Roof replacement coverage for asphalt shingle roofs older than 15 years shall transition from Actual Replacement Value to Actual Cash Value (ACV).\n        ",
+      "filename": "RC-2026-05_RoofDepreciation.txt",
+      "effective_date": "2026-05-20",
+      "impact_rating": "High",
+      "risk_level": "N/A",
+      "id": "RuleChange:RC-2026-05_RoofDepreciation.txt"
+    },
+    {
+      "label": "RC-2026-06_SupplyChainDowntime.txt",
+      "type": "RuleChange",
+      "text": "\n        RULE CHANGE NOTICE RC-2026-06 (BUSINESS INTERRUPTION WAITING PERIOD):\n        Modifying Section 5.3: Contingent business interruption coverage resulting from Tier-1 vendor supply chain disruptions now requires a mandatory 72-hour waiting period before indemnity payments commence.\n        ",
+      "filename": "RC-2026-06_SupplyChainDowntime.txt",
+      "effective_date": "2026-06-01",
+      "impact_rating": "High",
+      "risk_level": "N/A",
+      "id": "RuleChange:RC-2026-06_SupplyChainDowntime.txt"
+    },
+    {
+      "label": "RC-2026-07_PFASPollutionExclusion.txt",
+      "type": "RuleChange",
+      "text": "\n        RULE CHANGE NOTICE RC-2026-07 (PFAS & CONTAMINANT EXCLUSION):\n        Amending Clause 18.2: Comprehensive general liability policies shall completely exclude coverage for bodily injury or property damage arising out of Per- and Polyfluoroalkyl Substances (PFAS) contamination.\n        ",
+      "filename": "RC-2026-07_PFASPollutionExclusion.txt",
+      "effective_date": "2026-06-15",
+      "impact_rating": "Critical",
+      "risk_level": "N/A",
+      "id": "RuleChange:RC-2026-07_PFASPollutionExclusion.txt"
+    },
+    {
+      "label": "RC-2026-08_DOClawsuitDefense.txt",
+      "type": "RuleChange",
+      "text": "\n        RULE CHANGE NOTICE RC-2026-08 (D&O REGULATORY DEFENSE SUB-LIMITS):\n        Referencing Article 3: Defense costs for regulatory enforcement actions and SEC investigations are now subject to a strict $1,000,000 sub-limit per policy period.\n        ",
+      "filename": "RC-2026-08_DOClawsuitDefense.txt",
+      "effective_date": "2026-07-01",
+      "impact_rating": "Medium",
+      "risk_level": "N/A",
+      "id": "RuleChange:RC-2026-08_DOClawsuitDefense.txt"
+    },
+    {
+      "label": "RC-2026-09_CargoColdChain.txt",
+      "type": "RuleChange",
+      "text": "\n        RULE CHANGE NOTICE RC-2026-09 (MARITIME COLD CHAIN TEMPERATURE MONITORS):\n        Under Section 11.4, temperature-sensitive refrigerated cargo claims require continuous IoT data logs proving temperatures did not exceed 4 degrees Celsius during transport.\n        ",
+      "filename": "RC-2026-09_CargoColdChain.txt",
+      "effective_date": "2026-07-20",
+      "impact_rating": "High",
+      "risk_level": "N/A",
+      "id": "RuleChange:RC-2026-09_CargoColdChain.txt"
+    },
+    {
+      "label": "RC-2026-10_ProductRecallDeductible.txt",
+      "type": "RuleChange",
+      "text": "\n        RULE CHANGE NOTICE RC-2026-10 (PRODUCT RECALL MANDATORY DEDUCTIBLE):\n        Amending Paragraph 22.1: First-party product recall expense coverage now carries a minimum mandatory deductible of $50,000 or 10% of total recall expenses, whichever is greater.\n        ",
+      "filename": "RC-2026-10_ProductRecallDeductible.txt",
+      "effective_date": "2026-08-05",
+      "impact_rating": "Medium",
+      "risk_level": "N/A",
+      "id": "RuleChange:RC-2026-10_ProductRecallDeductible.txt"
+    },
+    {
+      "label": "POL-PROP-2024_CommercialProperty.txt",
+      "type": "ActualPolicy",
+      "text": "\n        COMMERCIAL PROPERTY MASTER POLICY:\n        Section 12.1 - Water Damage & Structural Overhead Coverage:\n        Covers internal plumbing bursts up to $250,000 per occurrence. \n        Clause 4.2 - Inspection Terms: Policyholders must maintain semi-annual plumbing maintenance logs.\n        Article 7 - Structural Additions: Roof replacements are covered under Full Replacement Cost without depreciation deduction.\n        ",
+      "filename": "POL-PROP-2024_CommercialProperty.txt",
+      "effective_date": "N/A",
+      "impact_rating": "N/A",
+      "risk_level": "Medium",
+      "id": "ActualPolicy:POL-PROP-2024_CommercialProperty.txt"
+    },
+    {
+      "label": "POL-AUTO-2025_FleetAuto.txt",
+      "type": "ActualPolicy",
+      "text": "\n        COMMERCIAL FLEET AUTO POLICY:\n        Section 8.1 - Emergency Roadside Recovery & Towing:\n        Policyholders are fully covered for roadside recovery up to $500 per event, including third-party towing providers chosen by the driver.\n        ",
+      "filename": "POL-AUTO-2025_FleetAuto.txt",
+      "effective_date": "N/A",
+      "impact_rating": "N/A",
+      "risk_level": "High",
+      "id": "ActualPolicy:POL-AUTO-2025_FleetAuto.txt"
+    },
+    {
+      "label": "POL-CYBER-2025_EnterpriseTech.txt",
+      "type": "ActualPolicy",
+      "text": "\n        ENTERPRISE CYBER LIABILITY POLICY:\n        Paragraph 15.3 - Security Safeguards & Identity Access Controls:\n        Insured entity must maintain commercial-grade identity access management, software MFA, and annual internal vulnerability assessments.\n        Excludes ransomware payout coverage if fundamental access policies are unverified.\n        ",
+      "filename": "POL-CYBER-2025_EnterpriseTech.txt",
+      "effective_date": "N/A",
+      "impact_rating": "N/A",
+      "risk_level": "Critical",
+      "id": "ActualPolicy:POL-CYBER-2025_EnterpriseTech.txt"
+    },
+    {
+      "label": "POL-HLTH-2023_GroupHealth.txt",
+      "type": "ActualPolicy",
+      "text": "\n        GROUP HEALTH COMPREHENSIVE PLAN:\n        Clause 9.4 - Pre-Existing Condition Exclusions:\n        Pre-existing conditions including cardiac and diabetic ailments are subject to a strict 24-month waiting window from enrollment date.\n        Co-pay rate is fixed at 15% in-network.\n        ",
+      "filename": "POL-HLTH-2023_GroupHealth.txt",
+      "effective_date": "N/A",
+      "impact_rating": "N/A",
+      "risk_level": "Low",
+      "id": "ActualPolicy:POL-HLTH-2023_GroupHealth.txt"
+    },
+    {
+      "label": "POL-EXEC-2025_DirectorsLiability.txt",
+      "type": "ActualPolicy",
+      "text": "\n        DIRECTORS & OFFICERS LIABILITY POLICY:\n        Article 3 - Regulatory Non-Compliance & Legal Defense:\n        Protects executive officers against shareholder lawsuits, regulatory audit penalties, and corporate governance disputes. Defense costs are covered up to the full aggregate policy limit of $5,000,000.\n        Excludes coverage for deliberate fraudulent activity or unapproved policy modifications.\n        ",
+      "filename": "POL-EXEC-2025_DirectorsLiability.txt",
+      "effective_date": "N/A",
+      "impact_rating": "N/A",
+      "risk_level": "Medium",
+      "id": "ActualPolicy:POL-EXEC-2025_DirectorsLiability.txt"
+    },
+    {
+      "label": "POL-BIZ-2024_SupplyChainInterruption.txt",
+      "type": "ActualPolicy",
+      "text": "\n        BUSINESS INTERRUPTION & CONTINGENT RISK POLICY:\n        Section 5.3 - Vendor Supply Chain Downtime:\n        Indemnifies lost net operating income following vendor operational shutdown. Indemnity payments begin immediately after a 24-hour elimination period.\n        ",
+      "filename": "POL-BIZ-2024_SupplyChainInterruption.txt",
+      "effective_date": "N/A",
+      "impact_rating": "N/A",
+      "risk_level": "High",
+      "id": "ActualPolicy:POL-BIZ-2024_SupplyChainInterruption.txt"
+    },
+    {
+      "label": "POL-ENV-2025_GeneralPollution.txt",
+      "type": "ActualPolicy",
+      "text": "\n        ENVIRONMENTAL IMPAIRMENT & GENERAL LIABILITY POLICY:\n        Clause 18.2 - Hazardous Substance Remediation:\n        Covers legal defense and environmental clean-up costs for accidental chemical spills and industrial emissions, subject to standard hazardous material definitions.\n        ",
+      "filename": "POL-ENV-2025_GeneralPollution.txt",
+      "effective_date": "N/A",
+      "impact_rating": "N/A",
+      "risk_level": "Critical",
+      "id": "ActualPolicy:POL-ENV-2025_GeneralPollution.txt"
+    },
+    {
+      "label": "POL-MAR-2024_OceanCargo.txt",
+      "type": "ActualPolicy",
+      "text": "\n        OCEAN CARGO & COLD CHAIN TRANSPORT POLICY:\n        Section 11.4 - Perishable Freight & Refrigeration Failure:\n        Protects against spoilage due to mechanical breakdown of refrigeration units. Requires manual temperature inspection logs recorded at origin and destination ports.\n        ",
+      "filename": "POL-MAR-2024_OceanCargo.txt",
+      "effective_date": "N/A",
+      "impact_rating": "N/A",
+      "risk_level": "Medium",
+      "id": "ActualPolicy:POL-MAR-2024_OceanCargo.txt"
+    },
+    {
+      "label": "POL-PROD-2025_ManufacturerLiability.txt",
+      "type": "ActualPolicy",
+      "text": "\n        COMMERCIAL PRODUCT LIABILITY PLAN:\n        Paragraph 22.1 - Product Recall & Withdrawal Expenses:\n        Reimburses costs for public notice, shipping, and destruction of defective products. Policy deductible is set at a flat $10,000 per recall event.\n        ",
+      "filename": "POL-PROD-2025_ManufacturerLiability.txt",
+      "effective_date": "N/A",
+      "impact_rating": "N/A",
+      "risk_level": "High",
+      "id": "ActualPolicy:POL-PROD-2025_ManufacturerLiability.txt"
+    },
+    {
+      "label": "POL-CONSTR-2023_BuildersRisk.txt",
+      "type": "ActualPolicy",
+      "text": "\n        BUILDERS RISK & INFRASTRUCTURE COVERAGE:\n        Section 14.1 - Weather Damage & Site Preservation:\n        Covers physical damage to structures under construction caused by windstorm, hail, or unexpected structural collapse.\n        ",
+      "filename": "POL-CONSTR-2023_BuildersRisk.txt",
+      "effective_date": "N/A",
+      "impact_rating": "N/A",
+      "risk_level": "Medium",
+      "id": "ActualPolicy:POL-CONSTR-2023_BuildersRisk.txt"
+    }
+  ],
+  "edges": [
+    {
+      "relation": "EXPLICIT_REF",
+      "match": "Clause 12.1",
+      "status": "COMPLIANT_MATCH",
+      "reason": "Explicit alignment on clause match 12.1",
+      "weight": 3.0,
+      "source": "RuleChange:RC-2026-01_WaterDamage.txt",
+      "target": "ActualPolicy:POL-PROP-2024_CommercialProperty.txt"
+    },
+    {
+      "relation": "EXPLICIT_REF",
+      "match": "Clause 8.1",
+      "status": "NON_COMPLIANT_CONFLICT",
+      "reason": "Cap mismatch on 8.1 ($100 rule vs $500 policy limit)",
+      "weight": 3.0,
+      "source": "RuleChange:RC-2026-02_AutoTowing.txt",
+      "target": "ActualPolicy:POL-AUTO-2025_FleetAuto.txt"
+    },
+    {
+      "relation": "EXPLICIT_REF",
+      "match": "Clause 15.3",
+      "status": "PARTIAL_UNDER_INSURED",
+      "reason": "Security spec gap on 15.3 (Hardware Token required vs Software MFA in place)",
+      "weight": 3.0,
+      "source": "RuleChange:RC-2026-03_CyberMFA.txt",
+      "target": "ActualPolicy:POL-CYBER-2025_EnterpriseTech.txt"
+    },
+    {
+      "relation": "EXPLICIT_REF",
+      "match": "Clause 9.4",
+      "status": "COMPLIANT_MATCH",
+      "reason": "Explicit alignment on clause match 9.4",
+      "weight": 3.0,
+      "source": "RuleChange:RC-2026-04_HealthPreExisting.txt",
+      "target": "ActualPolicy:POL-HLTH-2023_GroupHealth.txt"
+    },
+    {
+      "relation": "EXPLICIT_REF",
+      "match": "Clause 12.1",
+      "status": "NON_COMPLIANT_CONFLICT",
+      "reason": "Valuation conflict on 12.1 (ACV required vs Full Replacement Cost in policy)",
+      "weight": 3.0,
+      "source": "RuleChange:RC-2026-05_RoofDepreciation.txt",
+      "target": "ActualPolicy:POL-PROP-2024_CommercialProperty.txt"
+    },
+    {
+      "relation": "EXPLICIT_REF",
+      "match": "Clause 5.3",
+      "status": "COMPLIANT_MATCH",
+      "reason": "Explicit alignment on clause match 5.3",
+      "weight": 3.0,
+      "source": "RuleChange:RC-2026-06_SupplyChainDowntime.txt",
+      "target": "ActualPolicy:POL-CYBER-2025_EnterpriseTech.txt"
+    },
+    {
+      "relation": "EXPLICIT_REF",
+      "match": "Clause 5.3",
+      "status": "NON_COMPLIANT_CONFLICT",
+      "reason": "Waiting period mismatch on 5.3 (Rule requires 72h vs Policy 24h)",
+      "weight": 3.0,
+      "source": "RuleChange:RC-2026-06_SupplyChainDowntime.txt",
+      "target": "ActualPolicy:POL-BIZ-2024_SupplyChainInterruption.txt"
+    },
+    {
+      "relation": "EXPLICIT_REF",
+      "match": "Clause 18.2",
+      "status": "NON_COMPLIANT_CONFLICT",
+      "reason": "New exclusion on 18.2 (Rule excludes PFAS contaminants)",
+      "weight": 3.0,
+      "source": "RuleChange:RC-2026-07_PFASPollutionExclusion.txt",
+      "target": "ActualPolicy:POL-ENV-2025_GeneralPollution.txt"
+    },
+    {
+      "relation": "EXPLICIT_REF",
+      "match": "Clause 3",
+      "status": "COMPLIANT_MATCH",
+      "reason": "Explicit alignment on clause match 3",
+      "weight": 3.0,
+      "source": "RuleChange:RC-2026-08_DOClawsuitDefense.txt",
+      "target": "ActualPolicy:POL-CYBER-2025_EnterpriseTech.txt"
+    },
+    {
+      "relation": "EXPLICIT_REF",
+      "match": "Clause 3",
+      "status": "PARTIAL_UNDER_INSURED",
+      "reason": "Sub-limit restriction on 3 ($1M sub-limit vs $5M aggregate limit)",
+      "weight": 3.0,
+      "source": "RuleChange:RC-2026-08_DOClawsuitDefense.txt",
+      "target": "ActualPolicy:POL-EXEC-2025_DirectorsLiability.txt"
+    },
+    {
+      "relation": "EXPLICIT_REF",
+      "match": "Clause 3",
+      "status": "COMPLIANT_MATCH",
+      "reason": "Explicit alignment on clause match 3",
+      "weight": 3.0,
+      "source": "RuleChange:RC-2026-08_DOClawsuitDefense.txt",
+      "target": "ActualPolicy:POL-BIZ-2024_SupplyChainInterruption.txt"
+    },
+    {
+      "relation": "EXPLICIT_REF",
+      "match": "Clause 11.4",
+      "status": "PARTIAL_UNDER_INSURED",
+      "reason": "Monitoring gap on 11.4 (Continuous IoT required vs Manual logs in policy)",
+      "weight": 3.0,
+      "source": "RuleChange:RC-2026-09_CargoColdChain.txt",
+      "target": "ActualPolicy:POL-MAR-2024_OceanCargo.txt"
+    },
+    {
+      "relation": "EXPLICIT_REF",
+      "match": "Clause 22.1",
+      "status": "NON_COMPLIANT_CONFLICT",
+      "reason": "Deductible gap on 22.1 ($50k rule deductible vs $10k policy deductible)",
+      "weight": 3.0,
+      "source": "RuleChange:RC-2026-10_ProductRecallDeductible.txt",
+      "target": "ActualPolicy:POL-PROD-2025_ManufacturerLiability.txt"
+    }
+  ]
+}
