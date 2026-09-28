@@ -3,6 +3,7 @@ import Rail from './components/Rail.jsx'
 import UploadPanel from './components/UploadPanel.jsx'
 import ImpactResults from './components/ImpactResults.jsx'
 import ChatPanel from './components/ChatPanel.jsx'
+import GraphVisualizer from './components/GraphVisualizer.jsx' // Add this line
 import { createSession, uploadDocuments, runAnalysis, getSessionStatus, extractErrorMessage } from './api.js'
 
 export default function App() {
@@ -115,6 +116,7 @@ export default function App() {
           <>
             <ImpactResults result={result} />
             <ChatPanel sessionId={sessionId} />
+            <GraphVisualizer sessionId={sessionId} />
           </>
         )}
       </main>
