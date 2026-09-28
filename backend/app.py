@@ -3,10 +3,11 @@ import traceback
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-
+from benchmark import run_benchmark
 import config
 from services.session_store import store
 from services import pipeline_service, chat_service
+from reasoning.graph_store import driver, NODE_REGULATORY, NODE_POLICY, EDGE_DEPENDS_ON
 
 logging.basicConfig(
     level=logging.INFO,
@@ -62,6 +63,12 @@ def upload_documents():
 
     try:
         pipeline_service.ingest_documents(session, regulation_files, policy_files)
+        if hasattr(session, 'ingestion_report') and session.ingestion_report:
+            run_benchmark(
+                session.ingestion_report, 
+                len(session.regulation_clauses), 
+                config.SEARCH_TOP_K
+            )
     except ValueError as ve:
         return error_response(str(ve))
     except Exception as e:
@@ -151,6 +158,44 @@ def session_status(session_id):
         "has_analysis": session.analysis_result is not None,
         "chat_turns": len(session.chat_history) // 2,
     })
+
+
+@app.route("/api/graph/<session_id>", methods=["GET"])
+def get_graph_data(session_id):
+    """Fetches the active Neo4j graph for React visualization."""
+    try:
+        with driver.session() as session:
+            # Fetch nodes and relationships for the current session
+            query = f"""
+            MATCH (n) WHERE n.session_id = $sid
+            OPTIONAL MATCH (n)-[r]->(m) WHERE m.session_id = $sid
+            RETURN n, r, m
+            """
+            result = session.run(query, {"sid": session_id})
+            
+            nodes, edges = {}, []
+            for record in result:
+                n, r, m = record.get("n"), record.get("r"), record.get("m")
+                
+                # Deduplicate nodes
+                if n and n["id"] not in nodes:
+                    nodes[n["id"]] = {"id": n["id"], "label": n.get("section", n["id"]), "group": list(n.labels)[0]}
+                if m and m["id"] not in nodes:
+                    nodes[m["id"]] = {"id": m["id"], "label": m.get("section", m["id"]), "group": list(m.labels)[0]}
+                
+                # Append edges
+                if r:
+                    edges.append({
+                        "source": n["id"],
+                        "target": m["id"],
+                        "label": r.type,
+                        "color": "#C0392B" if r.type == "CONFLICTS_WITH" else "#2ECC71" if r.type == "COMPLIES_WITH" else "#BDC3C7"
+                    })
+
+            return jsonify({"nodes": list(nodes.values()), "links": edges})
+    except Exception as e:
+        logger.error(f"Graph fetch failed: {e}")
+        return error_response("Failed to fetch graph data", 500)
 
 
 if __name__ == "__main__":
