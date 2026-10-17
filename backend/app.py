@@ -8,6 +8,8 @@ import config
 from services.session_store import store
 from services import pipeline_service, chat_service
 from reasoning.graph_store import driver, NODE_REGULATORY, NODE_POLICY, EDGE_DEPENDS_ON
+from reasoning.risk_scorer import compute_document_risk, compute_clause_risk
+from reasoning.cross_impact import detect_regulatory_crossfire, detect_co_impact_clusters
 
 logging.basicConfig(
     level=logging.INFO,
@@ -196,6 +198,101 @@ def get_graph_data(session_id):
     except Exception as e:
         logger.error(f"Graph fetch failed: {e}")
         return error_response("Failed to fetch graph data", 500)
+
+
+@app.route("/api/risk/<session_id>", methods=["GET"])
+def get_document_risk(session_id):
+    """Returns aggregate compliance risk score for the session."""
+    try:
+        result = compute_document_risk(session_id)
+        if not result:
+            return error_response("No graph data found for this session.", 404)
+        return jsonify(result)
+    except Exception as e:
+        logger.error(f"Risk computation failed: {e}")
+        return error_response(f"Risk computation failed: {e}", 500)
+
+
+@app.route("/api/risk/<session_id>/<clause_id>", methods=["GET"])
+def get_clause_risk(session_id, clause_id):
+    """Returns risk score for a specific policy clause."""
+    try:
+        result = compute_clause_risk(session_id, clause_id)
+        if not result:
+            return error_response("Clause not found.", 404)
+        return jsonify(result)
+    except Exception as e:
+        logger.error(f"Clause risk computation failed: {e}")
+        return error_response(f"Clause risk computation failed: {e}", 500)
+
+
+@app.route("/api/crossfire/<session_id>", methods=["GET"])
+def get_crossfire(session_id):
+    """Finds policy clauses caught between contradictory regulatory demands."""
+    try:
+        crossfire = detect_regulatory_crossfire(session_id)
+        clusters = detect_co_impact_clusters(session_id)
+        return jsonify({
+            "crossfire": crossfire,
+            "co_impact_clusters": clusters,
+        })
+    except Exception as e:
+        logger.error(f"Cross-impact detection failed: {e}")
+        return error_response(f"Cross-impact detection failed: {e}", 500)
+
+
+@app.route("/api/graph/<session_id>/neighbourhood/<clause_id>", methods=["GET"])
+def get_clause_neighbourhood(session_id, clause_id):
+    """Returns the 1-hop neighbourhood of a specific clause for progressive graph exploration."""
+    try:
+        with driver.session() as session:
+            result = session.run(
+                """
+                MATCH (center {id: $cid, session_id: $sid})
+                OPTIONAL MATCH (center)-[r]-(neighbour)
+                WHERE neighbour.session_id = $sid
+                RETURN center, r, neighbour, labels(center) AS center_labels, 
+                       CASE WHEN neighbour IS NOT NULL THEN labels(neighbour) ELSE [] END AS neighbour_labels
+                """,
+                {"cid": clause_id, "sid": session_id}
+            )
+            
+            nodes, edges = {}, []
+            for record in result:
+                center = record.get("center")
+                r = record.get("r")
+                neighbour = record.get("neighbour")
+                center_labels = record.get("center_labels", [])
+                neighbour_labels = record.get("neighbour_labels", [])
+                
+                if center and center["id"] not in nodes:
+                    nodes[center["id"]] = {
+                        "id": center["id"],
+                        "label": center.get("section", center["id"]),
+                        "group": center_labels[0] if center_labels else "Unknown",
+                        "text": center.get("text", "")[:200],
+                    }
+                if neighbour and neighbour["id"] not in nodes:
+                    nodes[neighbour["id"]] = {
+                        "id": neighbour["id"],
+                        "label": neighbour.get("section", neighbour["id"]),
+                        "group": neighbour_labels[0] if neighbour_labels else "Unknown",
+                        "text": neighbour.get("text", "")[:200],
+                    }
+                
+                if r and center and neighbour:
+                    edge_color = "#C0392B" if r.type == "CONFLICTS_WITH" else "#2ECC71" if r.type == "COMPLIES_WITH" else "#3498DB" if r.type == "SUPPORTS" else "#F39C12" if r.type == "DEPENDS_ON" else "#BDC3C7"
+                    edges.append({
+                        "source": center["id"],
+                        "target": neighbour["id"],
+                        "label": r.type,
+                        "color": edge_color,
+                    })
+            
+            return jsonify({"nodes": list(nodes.values()), "links": edges, "center": clause_id})
+    except Exception as e:
+        logger.error(f"Neighbourhood fetch failed: {e}")
+        return error_response("Failed to fetch neighbourhood data", 500)
 
 
 if __name__ == "__main__":

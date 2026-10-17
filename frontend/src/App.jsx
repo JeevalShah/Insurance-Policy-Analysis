@@ -4,6 +4,8 @@ import UploadPanel from './components/UploadPanel.jsx'
 import ImpactResults from './components/ImpactResults.jsx'
 import ChatPanel from './components/ChatPanel.jsx'
 import GraphVisualizer from './components/GraphVisualizer.jsx' // Add this line
+import RiskDashboard from './components/RiskDashboard.jsx'
+import CrossfireAlerts from './components/CrossfireAlerts.jsx'
 import { createSession, uploadDocuments, runAnalysis, getSessionStatus, extractErrorMessage } from './api.js'
 
 export default function App() {
@@ -114,7 +116,9 @@ export default function App() {
 
         {stage === 'analyzed' && (
           <>
+            <RiskDashboard sessionId={sessionId} />
             <ImpactResults result={result} />
+            <CrossfireAlerts sessionId={sessionId} />
             <ChatPanel sessionId={sessionId} />
             <GraphVisualizer sessionId={sessionId} />
           </>

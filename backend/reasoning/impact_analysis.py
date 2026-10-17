@@ -125,7 +125,8 @@ def get_indirect_impacts(
                        indirect.text    AS text,
                        indirect.section AS section,
                        length(path)     AS hop_count,
-                       direct.id        AS triggered_by
+                       direct.id        AS triggered_by,
+                       [n IN nodes(path) | n.id] AS impact_chain
                 ORDER BY hop_count, indirect.id
                 """,
                 {
@@ -144,6 +145,7 @@ def get_indirect_impacts(
                     "relationship": "INDIRECT",
                     "hop_count":    data.get("hop_count"),
                     "triggered_by": data.get("triggered_by"),
+                    "impact_chain": data.get("impact_chain", []),
                 })
 
         return indirect
