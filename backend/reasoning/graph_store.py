@@ -1,11 +1,4 @@
-"""
-graph_store.py
-
-Central Neo4j connection and schema definitions.
-Exports the `driver` singleton. Other modules should import `driver`
-and use `with driver.session() as session:` for transactions.
-"""
-
+""" graph_store.py """
 import os
 import logging
 from dotenv import load_dotenv
@@ -14,23 +7,15 @@ from neo4j import GraphDatabase
 load_dotenv()
 logger = logging.getLogger(__name__)
 
-# ---------------------------------------------------------------------------
-# Schema constants 
-# ---------------------------------------------------------------------------
-
 NODE_REGULATORY = "RegulatoryClause"
 NODE_POLICY     = "PolicyClause"
-
-# Specific relationship types replace the generic EDGE_COMPLIANCE
 REL_CONFLICTS_WITH = "CONFLICTS_WITH"
 REL_COMPLIES_WITH  = "COMPLIES_WITH"
 REL_SUPPORTS       = "SUPPORTS"
 REL_IS_REDUNDANT   = "IS_REDUNDANT"
 REL_NOT_RELATED    = "NOT_RELATED"
-
 EDGE_DEPENDS_ON = "DEPENDS_ON"
 
-# Map the legacy classifier labels (from LLM) to our new specific Cypher relationship types
 LABEL_TO_REL_TYPE = {
     "CONFLICT": REL_CONFLICTS_WITH,
     "COMPLIANT": REL_COMPLIES_WITH,
@@ -38,51 +23,36 @@ LABEL_TO_REL_TYPE = {
     "REDUNDANT": REL_IS_REDUNDANT,
     "NOT_RELATED": REL_NOT_RELATED
 }
-
-# Helper list for querying all compliance-related edges
 ALL_COMPLIANCE_RELS = list(LABEL_TO_REL_TYPE.values())
-
-
-# ---------------------------------------------------------------------------
-# Connection
-# ---------------------------------------------------------------------------
 
 def _get_driver():
     uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
     user = os.getenv("NEO4J_USERNAME", "neo4j")
     password = os.getenv("NEO4J_PASSWORD")
-
     if not password:
-        raise EnvironmentError(
-            "Missing Neo4j credentials. "
-            "Set NEO4J_URI, NEO4J_USERNAME, NEO4J_PASSWORD in .env"
-        )
-
-    # The driver maintains a thread-safe connection pool
+        logger.warning("Missing Neo4j credentials. Set NEO4J_URI, NEO4J_USERNAME, NEO4J_PASSWORD in .env")
+        return None
     return GraphDatabase.driver(uri, auth=(user, password))
 
-try:
-    driver = _get_driver()
-    driver.verify_connectivity()
-    logger.info("Connected to Neo4j successfully.")
-except Exception as e:
-    logger.error(f"Neo4j connection failed: {e}")
-    raise
+driver = _get_driver()
+
+if driver:
+    try:
+        driver.verify_connectivity()
+        logger.info("Connected to Neo4j successfully.")
+    except Exception as e:
+        logger.error(f"Neo4j connection failed: {e}")
+        driver = None
 
 def close_driver():
-    """Optional cleanup hook for graceful shutdowns."""
     if driver:
         driver.close()
 
-# ---------------------------------------------------------------------------
-# Index bootstrap 
-# ---------------------------------------------------------------------------
-
 def ensure_indexes() -> None:
-    """
-    Creates composite indexes on (id, session_id) for O(log n) lookups.
-    Safe to call multiple times (CREATE INDEX IF NOT EXISTS).
-    """
+    if not driver:
+        logger.warning("Cannot ensure indexes: Neo4j driver is not initialized.")
+        return
+        
     index_cmds = [
         "CREATE INDEX reg_id_session IF NOT EXISTS FOR (n:RegulatoryClause) ON (n.id, n.session_id)",
         "CREATE INDEX pol_id_session IF NOT EXISTS FOR (n:PolicyClause) ON (n.id, n.session_id)",

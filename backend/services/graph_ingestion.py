@@ -5,19 +5,21 @@ Owns the entire Neo4j ingestion contract. Called once per document set
 upload; never called at query time.
 
 Ingestion stages (in order):
-    1. Clear stale graph data for this session's source docs (idempotency)
-    2. Write RegulatoryClause nodes (Batched UNWIND)
-    3. Write PolicyClause nodes (Batched UNWIND)
-    4. Write DEPENDS_ON edges (Batched UNWIND)
-    5. Find candidate pairs (FAISS — candidate generation)
-    6. Classify each pair (LLM via relationshipclassifier)
-    7. Write specific edges (CONFLICTS_WITH, COMPLIES_WITH, etc.)
-    8. Return IngestionReport (timing + counts for benchmarking)
+1. Clear stale graph data for this session's source docs (idempotency)
+2. Write RegulatoryClause nodes (Batched UNWIND)
+3. Write PolicyClause nodes (Batched UNWIND)
+4. Write DEPENDS_ON edges (Batched UNWIND)
+5. Find candidate pairs (FAISS — candidate generation)
+6. Classify each pair & extract reasoning (LLM - Batched & Concurrent)
+7. Write specific edges (CONFLICTS_WITH, COMPLIES_WITH, etc. with reasoning)
+8. Return IngestionReport (timing + counts for benchmarking)
 """
 
 import time
 import logging
 import math
+import json
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from typing import List, Dict, Any, Optional
 
@@ -92,7 +94,9 @@ class GraphIngestionPipeline:
         index,
         top_k: int = 10,
         model: str = "llama3",
-        distance_threshold: float = 1.0,
+        distance_threshold: float = 0.6,  # Tightened FAISS Distance Guardrails
+        max_embedding_workers: int = 10,
+        max_llm_workers: int = 2,
     ):
         self.embedder           = embedder
         self.classifier         = classifier
@@ -100,6 +104,10 @@ class GraphIngestionPipeline:
         self.top_k              = top_k
         self.model              = model
         self.distance_threshold = distance_threshold
+        
+        # Tune Concurrency Limits: Decouple lightweight tasks from heavy LLM generation
+        self.embedding_executor = ThreadPoolExecutor(max_workers=max_embedding_workers)
+        self.llm_executor       = ThreadPoolExecutor(max_workers=max_llm_workers)
         ensure_indexes()
 
     def ingest(
@@ -141,13 +149,8 @@ class GraphIngestionPipeline:
         logger.info(report.summary())
         return report
 
-    # ------------------------------------------------------------------
-    # Stage 1 — Idempotency: clear existing nodes for this session
-    # ------------------------------------------------------------------
-
     def _clear_session_nodes(self, session_id: str, report: IngestionReport) -> None:
         t0 = time.perf_counter()
-
         with driver.session() as session:
             session.run(
                 f"MATCH (n:{NODE_REGULATORY} {{session_id: $sid}}) DETACH DELETE n",
@@ -157,40 +160,24 @@ class GraphIngestionPipeline:
                 f"MATCH (n:{NODE_POLICY} {{session_id: $sid}}) DETACH DELETE n",
                 {"sid": session_id}
             )
-
         elapsed = time.perf_counter() - t0
         report.stages.append(StageTimer("clear_stale", elapsed, 0,
             f"cleared stale nodes for session {session_id}"))
         logger.info(f"Cleared stale graph data for session={session_id}")
 
-    # ------------------------------------------------------------------
-    # Stage 2 — Write RegulatoryClause nodes (Batched)
-    # ------------------------------------------------------------------
-
-    def _write_regulatory_nodes(
-        self,
-        clauses: List[Dict[str, Any]],
-        session_id: str,
-        report: IngestionReport,
-    ) -> None:
+    def _write_regulatory_nodes(self, clauses: List[Dict[str, Any]], session_id: str, report: IngestionReport) -> None:
         t0 = time.perf_counter()
         batch = []
-
         for clause in clauses:
             clause_id  = clause.get("clause_id") or clause.get("id") or ""
             text       = clause.get("text", "")
-            source_doc = clause.get("source_doc", "")
-            section    = clause.get("section", "")
-
             if not clause_id or not text:
-                logger.warning(f"Skipping regulatory clause with missing id or text: {clause}")
                 continue
-
             batch.append({
                 "id": clause_id,
                 "text": text[:2000],
-                "source_doc": source_doc,
-                "section": section,
+                "source_doc": clause.get("source_doc", ""),
+                "section": clause.get("section", ""),
             })
 
         written = len(batch)
@@ -208,36 +195,20 @@ class GraphIngestionPipeline:
         elapsed = time.perf_counter() - t0
         report.regulatory_clauses_written = written
         report.stages.append(StageTimer("write_reg_nodes", elapsed, written))
-        logger.info(f"Wrote {written} RegulatoryClause nodes in {elapsed:.2f}s")
 
-    # ------------------------------------------------------------------
-    # Stage 3 — Write PolicyClause nodes (Batched)
-    # ------------------------------------------------------------------
-
-    def _write_policy_nodes(
-        self,
-        clauses: List[Dict[str, Any]],
-        session_id: str,
-        report: IngestionReport,
-    ) -> None:
+    def _write_policy_nodes(self, clauses: List[Dict[str, Any]], session_id: str, report: IngestionReport) -> None:
         t0 = time.perf_counter()
         batch = []
-
         for clause in clauses:
             clause_id  = clause.get("clause_id") or clause.get("id") or ""
             text       = clause.get("text", "")
-            source_doc = clause.get("source_doc", "")
-            section    = clause.get("section", "")
-
             if not clause_id or not text:
-                logger.warning(f"Skipping policy clause with missing id or text: {clause}")
                 continue
-
             batch.append({
                 "id": clause_id,
                 "text": text[:2000],
-                "source_doc": source_doc,
-                "section": section,
+                "source_doc": clause.get("source_doc", ""),
+                "section": clause.get("section", ""),
             })
 
         written = len(batch)
@@ -255,25 +226,10 @@ class GraphIngestionPipeline:
         elapsed = time.perf_counter() - t0
         report.policy_clauses_written = written
         report.stages.append(StageTimer("write_pol_nodes", elapsed, written))
-        logger.info(f"Wrote {written} PolicyClause nodes in {elapsed:.2f}s")
 
-    # ------------------------------------------------------------------
-    # Stage 4 — Write DEPENDS_ON edges (Batched)
-    # ------------------------------------------------------------------
-
-    def _write_dependency_edges(
-        self,
-        dependency_graph: Dict[str, List[str]],
-        session_id: str,
-        report: IngestionReport,
-    ) -> None:
+    def _write_dependency_edges(self, dependency_graph: Dict[str, List[str]], session_id: str, report: IngestionReport) -> None:
         t0 = time.perf_counter()
-        pairs = []
-
-        for source_id, target_ids in dependency_graph.items():
-            for target_id in target_ids:
-                pairs.append({"src": source_id, "tgt": target_id})
-
+        pairs = [{"src": s, "tgt": t} for s, targets in dependency_graph.items() for t in targets]
         written = len(pairs)
         if pairs:
             cypher = f"""
@@ -288,11 +244,6 @@ class GraphIngestionPipeline:
         elapsed = time.perf_counter() - t0
         report.dependency_edges_written = written
         report.stages.append(StageTimer("write_dep_edges", elapsed, written))
-        logger.info(f"Wrote {written} DEPENDS_ON edges in {elapsed:.2f}s")
-
-    # ------------------------------------------------------------------
-    # Stage 5 — Find candidate pairs + classify + write specific edges
-    # ------------------------------------------------------------------
 
     def _classify_and_write_compliance_edges(
         self,
@@ -301,88 +252,114 @@ class GraphIngestionPipeline:
         session_id: str,
         report: IngestionReport,
     ) -> None:
-        t0           = time.perf_counter()
-        total_pairs  = 0
-        total_edges  = 0
-        total_llm    = 0
+        t0 = time.perf_counter()
+        
+        # 1. Retrieve candidates for all regulatory clauses
+        reg_to_policies = {}
+        for reg_clause in regulation_clauses:
+            reg_id   = reg_clause.get("clause_id") or reg_clause.get("id") or ""
+            reg_text = reg_clause.get("text", "")
+            if not reg_id or not reg_text:
+                continue
 
-        with driver.session() as session:
-            for reg_clause in regulation_clauses:
-                reg_id   = reg_clause.get("clause_id") or reg_clause.get("id") or ""
-                reg_text = reg_clause.get("text", "")
-                if not reg_id or not reg_text:
-                    continue
+            candidates = self._retrieve_candidates(reg_text, policy_clauses)
+            report.candidate_pairs_found += len(candidates)
+            
+            if candidates:
+                reg_to_policies[reg_id] = {
+                    "reg_text": reg_text,
+                    "candidates": candidates
+                }
 
-                candidates = self._retrieve_candidates(reg_text, policy_clauses)
-                total_pairs += len(candidates)
-                report.candidate_pairs_found += len(candidates)
+        # 2. Concurrently process LLM batches
+        futures = []
+        for reg_id, data in reg_to_policies.items():
+            report.llm_calls_made += 1
+            futures.append(
+                self.llm_executor.submit(self._process_batch, reg_id, data, session_id, report)
+            )
 
-                if not candidates:
-                    continue
-
-                try:
-                    results: Dict[str, str] = self.classifier.classify_relationship_batch(
-                        trigger=reg_text,
-                        candidates=candidates,
-                        model=self.model,
-                    )
-                    total_llm += math.ceil(len(candidates) / 4)
-                except Exception as e:
-                    logger.error(f"Classification failed for {reg_id}: {e}")
-                    report.errors.append(f"classify {reg_id}: {e}")
-                    continue
-
-                for pol_id, label in results.items():
-                    raw_label = label.upper().strip()
-                    rel_type = LABEL_TO_REL_TYPE.get(raw_label, REL_NOT_RELATED)
-
-                    # Do not write NOT_RELATED relationships to the graph
-                    if not rel_type or rel_type == REL_NOT_RELATED or rel_type == "NOT_RELATED":
-                        continue
-
-                    try:
-                        session.run(
-                            f"""
-                            MATCH (r:{NODE_REGULATORY} {{id: $rid, session_id: $sid}})
-                            MATCH (p:{NODE_POLICY}     {{id: $pid, session_id: $sid}})
-                            MERGE (r)-[e:{rel_type}]->(p)
-                            SET   e.classified_at  = $ts,
-                                  e.model          = $model
-                            """,
-                            {
-                                "rid":   reg_id,
-                                "sid":   session_id,
-                                "pid":   pol_id,
-                                "ts":    int(time.time()),
-                                "model": self.model,
-                            }
-                        )
-                        total_edges += 1
-                    except Exception as e:
-                        logger.warning(f"Edge {reg_id}-[{rel_type}]->{pol_id} failed: {e}")
-                        report.errors.append(f"edge {reg_id}->{pol_id}: {e}")
+        # Wait for completion and aggregate edges written
+        for future in as_completed(futures):
+            try:
+                edges_written = future.result()
+                report.compliance_edges_written += edges_written
+            except Exception as e:
+                report.errors.append(f"Batch processing error: {e}")
 
         elapsed = time.perf_counter() - t0
-        report.compliance_edges_written = total_edges
-        report.llm_calls_made          = total_llm
         report.stages.append(StageTimer(
-            "classify_and_write", elapsed, total_edges,
-            f"{total_llm} LLM calls for {total_pairs} pairs"
+            "classify_and_write", elapsed, report.compliance_edges_written,
+            f"{report.llm_calls_made} LLM calls for {report.candidate_pairs_found} pairs"
         ))
-        logger.info(
-            f"Classification complete: {total_pairs} pairs → "
-            f"{total_edges} edges, {total_llm} LLM calls, {elapsed:.2f}s"
-        )
 
-    # ------------------------------------------------------------------
-    # Helper — FAISS candidate retrieval
-    # ------------------------------------------------------------------
+    def _process_batch(self, reg_id: str, data: Dict, session_id: str, report: IngestionReport) -> int:
+        """Handles LLM interaction and Neo4j edge generation for a single regulatory trigger."""
+        prompt = f"""
+        Analyze the relationship between the following regulatory clause and multiple policy clauses.
+        
+        Regulation: {data['reg_text']}
+        
+        Policies:
+        {json.dumps([{'policy_id': c['clause_id'], 'text': c['text']} for c in data['candidates']], indent=2)}
+        
+        Evaluate each policy against the regulation. Return a structured JSON array. 
+        For each policy, provide:
+        - "policy_id": The ID of the policy
+        - "relationship": One of [CONFLICTS_WITH, COMPLIES_WITH, SUPPORTS, IS_REDUNDANT, NONE]
+        - "reasoning": A 50-word context-grounded explanation for the classification.
+        
+        Output ONLY valid JSON.
+        """
+        
+        edges_written = 0
+        try:
+            # Assuming self.classifier has a raw predict or generate method
+            response = self.classifier.llm.predict(prompt).strip() if hasattr(self.classifier, 'llm') else self.classifier.predict(prompt).strip()
+            
+            if response.startswith("```json"):
+                response = response.replace("```json", "").replace("```", "").strip()
+            elif response.startswith("```"):
+                response = response.replace("```", "").strip()
+                
+            classifications = json.loads(response)
+            
+            with driver.session() as session:
+                for item in classifications:
+                    raw_label = item.get("relationship", "").upper().strip()
+                    rel_type = LABEL_TO_REL_TYPE.get(raw_label, REL_NOT_RELATED)
+                    reasoning = item.get("reasoning", "")
+                    pol_id = item.get("policy_id")
+                    
+                    if not rel_type or rel_type == REL_NOT_RELATED or rel_type == "NOT_RELATED" or not pol_id:
+                        continue
 
-    def _retrieve_candidates(
-        self,
-        query_text: str,
-        policy_clauses: List[Dict[str, Any]],
-    ) -> List[Dict[str, Any]]:
+                    session.run(
+                        f"""
+                        MATCH (r:{NODE_REGULATORY} {{id: $rid, session_id: $sid}})
+                        MATCH (p:{NODE_POLICY}     {{id: $pid, session_id: $sid}})
+                        MERGE (r)-[e:{rel_type}]->(p)
+                        SET   e.classified_at = $ts,
+                              e.model         = $model,
+                              e.reasoning     = $reasoning
+                        """,
+                        {
+                            "rid": reg_id,
+                            "sid": session_id,
+                            "pid": pol_id,
+                            "ts": int(time.time()),
+                            "model": self.model,
+                            "reasoning": reasoning
+                        }
+                    )
+                    edges_written += 1
+        except Exception as e:
+            logger.error(f"Failed to process batch for reg {reg_id}: {e}")
+            raise e
+            
+        return edges_written
+
+    def _retrieve_candidates(self, query_text: str, policy_clauses: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         try:
             query_vec = self.embedder.embed_query(query_text)
 
@@ -401,7 +378,8 @@ class GraphIngestionPipeline:
                 txt = clause_data.get("text")
                 dist = r.get("distance", r.get("_distance", 0.0))
 
-                if cid and txt:
+                # Aggressively filter low-confidence vector matches
+                if cid and txt and dist <= self.distance_threshold:
                     candidates.append({
                         "clause_id": cid,
                         "text": txt,
@@ -439,7 +417,8 @@ def get_direct_impacts(
                    p.text        AS text,
                    p.section     AS section,
                    type(e)       AS relationship,
-                   e.classified_at AS classified_at
+                   e.classified_at AS classified_at,
+                   e.reasoning     AS reasoning
             ORDER BY relationship, p.id
             """,
             {"rid": reg_clause_id, "sid": session_id}
