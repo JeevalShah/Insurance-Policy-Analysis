@@ -35,7 +35,7 @@ export default function ImpactResults({ result }) {
             {directEntries.length === 0 ? (
               <div className="clause-row">
                 <div className="clause-id">—</div>
-                <div className="reasoning">No policy clause matched closely enough to flag.</div>
+                <div className="reasoning">No related policy clause was identified. Retrieved unrelated candidates are shown in the graph.</div>
               </div>
             ) : (
               directEntries.map(([clauseId, data]) => (

@@ -83,6 +83,7 @@ export default function RiskDashboard({ sessionId }) {
         <StatCard label="Compliant" value={risk.compliant_count} color="#2ECC71" />
         <StatCard label="Supporting" value={risk.supporting_count} color="#3498DB" />
         <StatCard label="Redundant" value={risk.redundant_count} color="#F39C12" />
+        <StatCard label="Classified unrelated" value={risk.unrelated_count} color="#7F8C8D" />
         <StatCard label="Unmatched" value={risk.unmatched_count} color="#95A5A6" />
         <StatCard label="Total Policy" value={risk.total_policy_clauses} color="#2C3E50" />
       </div>

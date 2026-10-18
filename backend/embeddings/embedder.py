@@ -87,6 +87,10 @@ class PolicyEmbedder:
         if not text:
             return None
 
+        # Truncate text to stay safely within model context window (~1500 words / 6000 chars)
+        if len(text) > 6000:
+            text = text[:6000]
+
         try:
             self._increment_embed_calls()
             response = ollama.embeddings(
@@ -107,7 +111,15 @@ class PolicyEmbedder:
         text (e.g. re-running analysis, or a repeated chat question), no new
         Ollama call is made.
         """
-        cache_key = text.strip()
+        clean_text = (text or "").strip()
+        if not clean_text:
+            return [0.0] * 768
+
+        # nomic-embed-text max context is 2048 tokens (~1500 words / 6000 chars)
+        if len(clean_text) > 6000:
+            clean_text = clean_text[:6000]
+
+        cache_key = clean_text
         with self._cache_lock:
             cached = self._query_embedding_cache.get(cache_key)
         if cached is not None:

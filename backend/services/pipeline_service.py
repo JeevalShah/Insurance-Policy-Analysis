@@ -8,8 +8,8 @@ Combines vector indexing and Neo4j graph ingestion into a single workflow.
 import logging
 from typing import List, Dict, Any
 
-from backend.services.session_store import SessionStore
-from backend.services.graph_ingestion import GraphIngestionPipeline
+from services.session_store import SessionStore
+from services.graph_ingestion import GraphIngestionPipeline
 
 logger = logging.getLogger(__name__)
 
@@ -67,8 +67,11 @@ class UploadPipelineService:
                 "message": "Documents successfully vectorized and compliance graph constructed.",
                 "ingestion_metrics": {
                     "total_time_seconds": round(report.total_elapsed_s, 2),
+                    "candidate_pairs_found": report.candidate_pairs_found,
                     "compliance_edges_created": report.compliance_edges_written,
-                    "llm_calls_made": report.llm_calls_made
+                    "unrelated_pairs_classified": report.unrelated_pairs_classified,
+                    "llm_calls_made": report.llm_calls_made,
+                    "errors": report.errors,
                 }
             }
 

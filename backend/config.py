@@ -17,17 +17,17 @@ CHAT_MODEL = os.environ.get("CHAT_MODEL", "llama3")
 # per regulatory trigger. SEARCH_CANDIDATE_K is the raw number of nearest
 # neighbours pulled from FAISS *before* distance filtering (two-stage
 # retrieval: cheap FAISS filter first, LLM only sees what survives).
-SEARCH_TOP_K = int(os.environ.get("SEARCH_TOP_K", 2))
-SEARCH_CANDIDATE_K = int(os.environ.get("SEARCH_CANDIDATE_K", 2))
+SEARCH_TOP_K = int(os.environ.get("SEARCH_TOP_K", 4))
+SEARCH_CANDIDATE_K = int(os.environ.get("SEARCH_CANDIDATE_K", 4))
 
 # NOTE ON THIS THRESHOLD: embeddings are now L2-normalized before being added
 # to / queried against the FAISS IndexFlatL2 index (see embeddings/embedder.py).
 # For unit vectors, L2_distance^2 = 2 - 2*cos_similarity, so distance lives in
 # [0, 4] instead of the previous unnormalized range (observed ~185-207).
-# A threshold of 1.0 corresponds to cos_similarity >= 0.5, which is why this
-# value was left unchanged rather than picked arbitrarily -- it now actually
-# does something.
-SEARCH_DISTANCE_THRESHOLD = float(os.environ.get("SEARCH_DISTANCE_THRESHOLD", 0.65))
+# FAISS uses squared L2 distance on normalized vectors, so lower is stricter.
+# Keep this at the requested value; the classifier only sees candidates at or
+# below this distance.
+SEARCH_DISTANCE_THRESHOLD = float(os.environ.get("SEARCH_DISTANCE_THRESHOLD", 0.6))
 
 # Chat retrieval tuning (slightly looser than impact analysis so the chatbot
 # doesn't go silent on borderline-relevant follow-up questions)
@@ -49,7 +49,7 @@ EMBED_MAX_WORKERS = int(os.environ.get("EMBED_MAX_WORKERS", 4))
 # Kept conservative by default: local Ollama inference does not necessarily
 # get faster with more concurrent requests, and can start thrashing RAM/VRAM.
 # Raise this only if you've verified it helps on your hardware.
-LLM_MAX_CONCURRENCY = 1
+LLM_MAX_CONCURRENCY = int(os.environ.get("LLM_MAX_CONCURRENCY", 2))
 
 # --- Trigger summarization ---
 MAX_QUERY_WORDS = int(os.environ.get("MAX_QUERY_WORDS", 350))

@@ -56,6 +56,7 @@ class IngestionReport:
     dependency_edges_written: int   = 0
     candidate_pairs_found: int      = 0
     compliance_edges_written: int   = 0
+    unrelated_pairs_classified: int = 0
     llm_calls_made: int             = 0
     stages: List[StageTimer]        = field(default_factory=list)
     errors: List[str]               = field(default_factory=list)
@@ -72,6 +73,7 @@ class IngestionReport:
             f"  DEPENDS_ON edges   : {self.dependency_edges_written}",
             f"  Candidate pairs    : {self.candidate_pairs_found}",
             f"  COMPLIANCE edges   : {self.compliance_edges_written}",
+            f"  Unrelated pairs    : {self.unrelated_pairs_classified}",
             f"  LLM calls made     : {self.llm_calls_made}",
             f"  Total time         : {self.total_elapsed_s:.2f}s",
         ]
@@ -263,8 +265,9 @@ class GraphIngestionPipeline:
                  
         # 1. Retrieve candidates for all regulatory clauses
         reg_to_policies = {}
+        retrieval_futures = {}
         for reg_clause in regulation_clauses:
-            reg_id   = reg_clause.get("clause_id") or reg_clause.get("id") or ""
+            reg_id = reg_clause.get("clause_id") or reg_clause.get("id") or ""
             reg_text = reg_clause.get("text", "")
             if not reg_id or not reg_text:
                 continue
@@ -290,8 +293,9 @@ class GraphIngestionPipeline:
         # Wait for completion and aggregate edges written
         for future in as_completed(futures):
             try:
-                edges_written = future.result()
+                edges_written, unrelated_written = future.result()
                 report.compliance_edges_written += edges_written
+                report.unrelated_pairs_classified += unrelated_written
             except Exception as e:
                 report.errors.append(f"Batch processing error: {e}")
 
@@ -301,13 +305,44 @@ class GraphIngestionPipeline:
             f"{report.llm_calls_made} LLM calls for {report.candidate_pairs_found} pairs"
         ))
 
-    def _process_batch(self, reg_id: str, data: Dict, session_id: str, report: IngestionReport) -> int:
+    def _process_batch(self, reg_id: str, data: Dict, session_id: str, report: IngestionReport) -> tuple[int, int]:
         """Handles LLM interaction and Neo4j edge generation for a single regulatory trigger."""
+        reg_text_safe = data['reg_text'][:1500] + "..." if len(data['reg_text']) > 1500 else data['reg_text']
+        policy_candidates = [
+            {
+                'policy_id': c.get('clause_id') or c.get('id'),
+                'text': (c.get('text', '')[:1000] + "...") if len(c.get('text', '')) > 1000 else c.get('text', '')
+            }
+            for c in data.get('candidates', [])
+        ]
+
+        response_schema = {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "policy_id": {"type": "string", "enum": [str(c["policy_id"]) for c in policy_candidates]},
+                    "relationship": {
+                        "type": "string",
+                        "enum": ["CONFLICTS_WITH", "COMPLIES_WITH", "SUPPORTS", "IS_REDUNDANT", "NONE"],
+                    },
+                    "reasoning": {"type": "string"},
+                },
+                "required": ["policy_id", "relationship", "reasoning"],
+                "additionalProperties": False,
+            },
+            "minItems": len(policy_candidates),
+            "maxItems": len(policy_candidates),
+        }
+
         prompt = f"""
-        Analyze the relationship between the following regulatory clause and multiple policy clauses.
-        
-        Regulation: {data['reg_text']}
-        
+        Compare the regulatory clause with every policy clause. These clauses concern the same subject because they were retrieved as candidates. Classify their substantive relationship; do not label a pair NONE merely because the wording differs.
+
+        Use CONFLICTS_WITH when requirements cannot both be satisfied, including different deadlines or limits. Use COMPLIES_WITH when the policy meets the regulatory requirement. Use SUPPORTS when the policy adds a compatible control that advances the requirement. Use IS_REDUNDANT when it repeats the same obligation without adding a distinct control. Use NONE only when the clauses have no meaningful compliance relationship.
+
+        Regulation:
+        {reg_text_safe}
+
         Policies:
         {json.dumps([{'policy_id': c['clause_id'], 'text': c['text']} for c in data['candidates']], indent=2)}
         
@@ -321,11 +356,27 @@ class GraphIngestionPipeline:
         """
         
         edges_written = 0
+        unrelated_written = 0
+        candidate_ids = {
+            str(candidate.get("clause_id") or candidate.get("id") or "")
+            for candidate in data.get("candidates", [])
+        }
+        candidate_ids.discard("")
         try:
             client = self.classifier.llm if hasattr(self.classifier, 'llm') else self.classifier
             
-            # Force JSON format via the updated client
-            response = client.predict(prompt, format="json").strip()
+            # Constrain the response to one result per retrieved candidate.
+            # Fall back to ordinary JSON mode for older Ollama versions that
+            # do not accept JSON Schema as the format argument.
+            try:
+                response = client.predict(prompt, format=response_schema).strip()
+            except Exception as schema_error:
+                logger.warning(
+                    "Structured output was rejected for reg %s; retrying in JSON mode: %s",
+                    reg_id,
+                    schema_error,
+                )
+                response = client.predict(prompt, format="json").strip()
             
             # Sanitize the LLM Output Before Parsing
             clean_text = re.sub(r"^```(?:json)?\s*|\s*```$", "", response, flags=re.MULTILINE)
@@ -340,6 +391,30 @@ class GraphIngestionPipeline:
                 classifications = [classifications]
             elif not isinstance(classifications, list):
                 classifications = []
+
+            # Some model versions still omit items despite the schema. Keep
+            # every retrieved candidate classified so it does not appear as
+            # silently unclassified in the graph/dashboard.
+            returned_ids = {
+                str(item.get("policy_id", "")).strip()
+                for item in classifications
+                if isinstance(item, dict)
+            }
+            missing_ids = candidate_ids - returned_ids
+            if missing_ids:
+                logger.warning(
+                    "Classifier omitted %d candidate(s) for reg %s; marking omitted results NOT_RELATED",
+                    len(missing_ids),
+                    reg_id,
+                )
+                classifications.extend(
+                    {
+                        "policy_id": policy_id,
+                        "relationship": "NONE",
+                        "reasoning": "The classifier returned no result for this retrieved candidate; it is recorded as unrelated pending review.",
+                    }
+                    for policy_id in sorted(missing_ids)
+                )
             
             with driver.session() as session:
                 for item in classifications:
@@ -347,12 +422,12 @@ class GraphIngestionPipeline:
                     if not isinstance(item, dict):
                         continue
                         
-                    raw_label = item.get("relationship", "").upper().strip()
+                    raw_label = str(item.get("relationship", "")).upper().strip()
                     rel_type = LABEL_TO_REL_TYPE.get(raw_label, REL_NOT_RELATED)
                     reasoning = item.get("reasoning", "")
-                    pol_id = item.get("policy_id")
+                    pol_id = str(item.get("policy_id", "")).strip()
                     
-                    if not rel_type or rel_type == REL_NOT_RELATED or rel_type == "NOT_RELATED" or not pol_id:
+                    if not rel_type or not pol_id or pol_id not in candidate_ids:
                         continue
                         
                     session.run(
@@ -374,16 +449,19 @@ class GraphIngestionPipeline:
                         }
                     )
                     edges_written += 1
+                    if rel_type == REL_NOT_RELATED:
+                        unrelated_written += 1
                     
         except Exception as e:
             logger.error(f"Failed to process batch for reg {reg_id}: {e}")
             raise e
             
-        return edges_written
+        return edges_written, unrelated_written
 
     def _retrieve_candidates(self, query_text: str, policy_clauses: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         try:
-            query_vec = self.embedder.embed_query(query_text)
+            safe_query = query_text[:4000] if len(query_text) > 4000 else query_text
+            query_vec = self.embedder.embed_query(safe_query)
 
             raw_results = self.embedder.secure_search(
                 index=self.index,

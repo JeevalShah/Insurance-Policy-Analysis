@@ -77,19 +77,24 @@ class ImpactAnalyzer:
         """
         Traverses DEPENDS_ON edges to find operational documents impacted by direct policy changes.
         """
+        hops = int(self.max_hops) if self.max_hops else 3
         query = f"""
         MATCH (r:{NODE_REGULATORY} {{id: $rid, session_id: $sid}})
               -[e:CONFLICTS_WITH|COMPLIES_WITH|SUPPORTS]->
               (direct:{NODE_POLICY})
         WITH direct
-        MATCH (direct)-[:{EDGE_DEPENDS_ON}*1..$max_hops]->(indirect:{NODE_POLICY} {{session_id: $sid}})
+        MATCH path = (direct)-[:{EDGE_DEPENDS_ON}*1..{hops}]->(indirect:{NODE_POLICY} {{session_id: $sid}})
         WHERE indirect.id <> direct.id
         RETURN DISTINCT
                indirect.id      AS policy_id,
                indirect.text    AS text,
                indirect.section AS section,
+               length(path)     AS hop_count,
+               direct.id        AS triggered_by,
+               [n IN nodes(path) | n.id] AS impact_chain,
                'INDIRECT_DEPENDENCY' AS relationship
+        ORDER BY hop_count, indirect.id
         """
         with driver.session() as session:
-            result = session.run(query, {"rid": reg_clause_id, "sid": session_id, "max_hops": self.max_hops})
+            result = session.run(query, {"rid": reg_clause_id, "sid": session_id})
             return [record.data() for record in result]

@@ -20,6 +20,7 @@ from reasoning.graph_store import (
     REL_COMPLIES_WITH,
     REL_SUPPORTS,
     REL_IS_REDUNDANT,
+    REL_NOT_RELATED,
 )
 
 logger = logging.getLogger("RiskScorer")
@@ -73,12 +74,19 @@ def compute_document_risk(session_id: str) -> Dict[str, Any]:
             compliant_count  = edge_counts.get(REL_COMPLIES_WITH, 0)
             supporting_count = edge_counts.get(REL_SUPPORTS, 0)
             redundant_count  = edge_counts.get(REL_IS_REDUNDANT, 0)
+            unrelated_count = session.run(
+                f"""
+                MATCH (r:{NODE_REGULATORY} {{session_id: $sid}})-[e:{REL_NOT_RELATED}]->(p:{NODE_POLICY} {{session_id: $sid}})
+                RETURN count(e) AS c
+                """,
+                {"sid": session_id}
+            ).single()["c"]
 
             # 3. Unmatched policy clauses (no incoming compliance edges from regulatory clauses)
             unmatched_res = session.run(
                 f"""
                 MATCH (p:{NODE_POLICY} {{session_id: $sid}})
-                WHERE NOT (:{NODE_REGULATORY} {{session_id: $sid}})-[:{REL_CONFLICTS_WITH}|{REL_COMPLIES_WITH}|{REL_SUPPORTS}|{REL_IS_REDUNDANT}]->(p)
+                WHERE NOT (:{NODE_REGULATORY} {{session_id: $sid}})-[:{REL_CONFLICTS_WITH}|{REL_COMPLIES_WITH}|{REL_SUPPORTS}|{REL_IS_REDUNDANT}|{REL_NOT_RELATED}]->(p)
                 RETURN count(p) AS c
                 """,
                 {"sid": session_id}
@@ -132,6 +140,7 @@ def compute_document_risk(session_id: str) -> Dict[str, Any]:
                 "compliant_count":          compliant_count,
                 "supporting_count":         supporting_count,
                 "redundant_count":          redundant_count,
+                "unrelated_count":          unrelated_count,
                 "unmatched_count":          unmatched_count,
                 "health_pct":               health_pct,
                 "risk_level":               risk_level,

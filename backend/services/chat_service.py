@@ -99,8 +99,11 @@ class ChatService:
         """
         Formats the retrieved vector text and structured graph relationships into a single prompt.
         """
-        # Format Text Context
-        text_context_str = "\n".join([f"- [{c['type'].upper()} {c['id']}]: {c['text']}" for c in vector_context])
+        # Format Text Context (truncate long text chunks to keep within context window)
+        text_context_str = "\n".join([
+            f"- [{c.get('type', 'doc').upper()} {c.get('id', '')}]: {(c.get('text', '')[:1200] + '...') if len(c.get('text', '')) > 1200 else c.get('text', '')}"
+            for c in vector_context
+        ])
         
         # Format Graph Context
         graph_context_str = ""

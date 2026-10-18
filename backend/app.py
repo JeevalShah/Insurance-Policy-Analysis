@@ -1,3 +1,6 @@
+
+
+
 import logging
 import traceback
 import os
@@ -247,20 +250,43 @@ def get_graph_data(session_id):
             result = session.run(query, {"sid": session_id})
             
             nodes, edges = {}, []
+
+            def graph_node_id(node):
+                label = next(iter(node.labels), "Clause")
+                return f"{label}:{node['id']}"
+
             for record in result:
                 n, r, m = record.get("n"), record.get("r"), record.get("m")
                 
-                if n and n["id"] not in nodes:
-                    nodes[n["id"]] = {"id": n["id"], "label": n.get("section", n["id"]), "group": list(n.labels)[0]}
-                if m and m["id"] not in nodes:
-                    nodes[m["id"]] = {"id": m["id"], "label": m.get("section", m["id"]), "group": list(m.labels)[0]}
+                if n and graph_node_id(n) not in nodes:
+                    node_key = graph_node_id(n)
+                    node_type = next(iter(n.labels), "Clause")
+                    short_type = "Regulatory" if node_type == "RegulatoryClause" else "Policy"
+                    nodes[node_key] = {
+                        "id": node_key,
+                        "clause_id": n["id"],
+                        "label": f"{short_type} {n.get('section') or n['id']}",
+                        "group": node_type,
+                        "text": n.get("text", "")[:200],
+                    }
+                if m and graph_node_id(m) not in nodes:
+                    node_key = graph_node_id(m)
+                    node_type = next(iter(m.labels), "Clause")
+                    short_type = "Regulatory" if node_type == "RegulatoryClause" else "Policy"
+                    nodes[node_key] = {
+                        "id": node_key,
+                        "clause_id": m["id"],
+                        "label": f"{short_type} {m.get('section') or m['id']}",
+                        "group": node_type,
+                        "text": m.get("text", "")[:200],
+                    }
                     
                 if r:
                     edges.append({
-                        "source": n["id"],
-                        "target": m["id"],
+                        "source": graph_node_id(n),
+                        "target": graph_node_id(m),
                         "label": r.type,
-                        "color": "#C0392B" if r.type == "CONFLICTS_WITH" else "#2ECC71" if r.type == "COMPLIES_WITH" else "#BDC3C7"
+                        "color": "#C0392B" if r.type == "CONFLICTS_WITH" else "#2ECC71" if r.type == "COMPLIES_WITH" else "#3498DB" if r.type == "SUPPORTS" else "#F39C12" if r.type == "IS_REDUNDANT" else "#BDC3C7"
                     })
             return jsonify({"nodes": list(nodes.values()), "links": edges})
     except Exception as e:
