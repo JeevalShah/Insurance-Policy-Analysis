@@ -1,155 +1,135 @@
 """
 chat_service.py
 
-Handles conversational context retrieval and LLM responses over FAISS search 
-and the populated Neo4j knowledge graph.
+Handles conversational RAG queries from the user (/api/chat).
+Combines FAISS vector retrieval with pre-computed Neo4j graph context 
+to provide highly grounded, hallucination-free answers.
 """
 
 import logging
-from typing import Any, Dict, List, Optional
-import ollama
-import config
-from retrieval.semanticsearch import SemanticSearch
-from services.session_store import SessionState
+from typing import Dict, Any, List
+from reasoning.graph_store import driver, NODE_REGULATORY, NODE_POLICY
+from reasoning.impact_analysis import ImpactAnalyzer
 
-from reasoning.graph_store import (
-    driver,
-    NODE_REGULATORY,
-    NODE_POLICY,
-    EDGE_DEPENDS_ON,
-)
+logger = logging.getLogger(__name__)
 
-logger = logging.getLogger("ChatService")
+class ChatService:
+    def __init__(self, llm_client, session_store, embedder):
+        self.llm = llm_client
+        self.session_store = session_store # Store the reference to the parent object
+        self.embedder = embedder
+        self.impact_analyzer = ImpactAnalyzer()
 
-# Map specific Neo4j relationship types back to friendly labels
-REL_TYPE_TO_LABEL = {
-    "CONFLICTS_WITH": "CONFLICT",
-    "COMPLIES_WITH":  "COMPLIANT",
-    "SUPPORTS":       "SUPPORTING",
-    "IS_REDUNDANT":   "REDUNDANT",
-    "NOT_RELATED":    "NOT_RELATED"
-}
-
-SYSTEM_PROMPT = """You are an insurance compliance assistant helping a user understand a regulatory impact analysis. 
-Rules:
-- Answer only using the retrieved policy clauses and the Knowledge Graph context provided below.
-- If the retrieved context does not contain the answer, say so plainly.
-- Reference clause IDs (e.g. "Clause 2.1") when you rely on them.
-- Be concise and precise, like a compliance analyst."""
-
-
-def _get_graph_context(clause_ids: List[str], session_id: Optional[str] = None) -> str:
-    """Queries Neo4j natively for compliance status and dependencies."""
-    if not clause_ids:
-        return "(No graph context available.)"
+    def generate_response(self, session_id: str, query: str, chat_history: List[Dict[str, str]] = None) -> Dict[str, Any]:
+        logger.info(f"Processing chat query for session {session_id}: {query}")
         
-    query = f"""
-    MATCH (c:{NODE_POLICY})
-    WHERE c.id IN $clause_ids AND ($sid IS NULL OR c.session_id = $sid)
-    OPTIONAL MATCH (r:{NODE_REGULATORY})-[rel]->(c)
-    WHERE NOT type(rel) = $dep_edge
-    OPTIONAL MATCH (c)-[:{EDGE_DEPENDS_ON}]->(dep:{NODE_POLICY})
-    WITH c,
-         CASE WHEN r IS NOT NULL THEN {{reg: r.id, status: type(rel), reasoning: rel.reasoning}} ELSE NULL END AS comp_item,
-         dep.id AS dep_id
-    RETURN c.id AS clause, 
-           collect(DISTINCT comp_item) AS compliance,
-           collect(DISTINCT dep_id) AS dependencies
-    """
-    try:
-        with driver.session() as session:
-            result = session.run(
-                query,
-                {
-                    "clause_ids": clause_ids,
-                    "sid": session_id,
-                    "dep_edge": EDGE_DEPENDS_ON,
+        vector_context = self._get_vector_context(session_id, query)
+        graph_context = self._get_graph_context(session_id, vector_context)
+        prompt = self._build_rag_prompt(query, vector_context, graph_context, chat_history)
+        
+        try:
+            response_text = self.llm.predict(prompt)
+            return {
+                "status": "success",
+                "session_id": session_id,
+                "answer": response_text,
+                "context_used": {
+                    "vector_results": len(vector_context),
+                    "graph_results": len(graph_context)
                 }
-            )
-            records = [record.data() for record in result]
-        
-        blocks = []
-        for record in records:
-            clause_id = record.get("clause")
-            compliance_data = record.get("compliance", [])
-            dependencies = record.get("dependencies", [])
-            
-            block = f"Graph Data for Clause {clause_id}:"
-            
-            # Format Compliance Edges
-            for comp in compliance_data:
-                if comp and comp.get('status'):
-                    raw_status = comp['status']
-                    friendly_status = REL_TYPE_TO_LABEL.get(raw_status, raw_status)
-                    reasoning_str = f" - {comp['reasoning']}" if comp.get('reasoning') else ""
-                    block += f"\n  - Status: {friendly_status} (Regulation {comp.get('reg')}){reasoning_str}"
-                    
-            # Format Dependency Edges
-            deps = [d for d in dependencies if d is not None]
-            if deps:
-                block += f"\n  - Operationally affects downstream clauses: {', '.join(deps)}"
+            }
+        except Exception as e:
+            logger.error(f"LLM generation failed: {e}")
+            return {"status": "error", "message": "Failed to generate response."}
+
+    def _get_vector_context(self, session_id: str, query: str, k: int = 4) -> List[Dict[str, Any]]:
+        try:
+            # Added dynamic check for the vector store
+            if not self.session_store.vector_store:
+                return []
                 
-            blocks.append(block)
-            
-        return "\n\n".join(blocks) if blocks else "(No graph context available.)"
+            query_vec = self.embedder.embed_query(query)
+            results = self.session_store.vector_store.similarity_search_by_vector(
+                query_vec, k=k, filter={"session_id": session_id}
+            )
+            return [
+                {
+                    "id": doc.metadata.get("id", "unknown"),
+                    "text": doc.page_content,
+                    "type": doc.metadata.get("type", "document")
+                }
+                for doc in results
+            ]
+        except Exception as e:
+            logger.warning(f"Vector search failed: {e}")
+            return []
 
-    except Exception as e:
-        logger.error(f"Graph query failed: {e}")
-        return "(Error retrieving graph context.)"
-
-
-def _format_context(retrieved: List[Dict[str, Any]]) -> str:
-    if not retrieved:
-        return "(No closely matching policy clauses were found for this question.)"
-    blocks = [f"Clause {r['clause']['clause_id']}:\n{r['clause']['text']}" for r in retrieved]
-    return "\n\n".join(blocks)
-
-
-def chat(session: SessionState, user_message: str) -> Dict[str, Any]:
-    """Answers follow-up questions using FAISS retrieval + Neo4j context."""
-    if session.index is None or not session.policy_clauses:
-        raise ValueError("No document set has been ingested for this session yet.")
+    def _get_graph_context(self, session_id: str, vector_context: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Uses the IDs retrieved from the vector search to pull connected compliance 
+        relationships and pre-computed reasoning directly from Neo4j.
+        """
+        graph_data = []
         
-    searcher = SemanticSearch(session.index, session.policy_clauses, embedder=session.embedder)
-    retrieved = searcher.search(
-        user_message,
-        k=config.CHAT_TOP_K,
-        distance_threshold=config.CHAT_DISTANCE_THRESHOLD,
-    )
-    
-    # Retrieve clause IDs to query the graph
-    clause_ids = [r["clause"]["clause_id"] for r in retrieved]
-    session_id = getattr(session, "session_id", None)
-    
-    text_context = _format_context(retrieved)
-    graph_context = _get_graph_context(clause_ids, session_id=session_id)
-    
-    history = session.chat_history[-(config.MAX_CHAT_HISTORY_TURNS * 2):] if session.chat_history else []
-    
-    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-    messages.extend(history)
-    
-    # Inject FAISS text + Neo4j relations into the prompt
-    augmented_user_message = (
-        f"Context for this question:\n"
-        f"---\n"
-        f"Retrieved Policy Clauses (Text Content):\n{text_context}\n\n"
-        f"Knowledge Graph Context (Compliance & Dependencies):\n{graph_context}\n"
-        f"---\n\n"
-        f"User Question: {user_message}"
-    )
-    
-    messages.append({"role": "user", "content": augmented_user_message})
-    
-    try:
-        response = ollama.chat(model=config.CHAT_MODEL, messages=messages)
-        answer = response["message"]["content"].strip()
-    except Exception as e:
-        logger.error(f"Chat generation failed: {e}")
-        raise RuntimeError("The local language model could not be reached. Is Ollama running?") from e
+        # Extract regulatory IDs from the vector results to seed the graph traversal
+        reg_ids = [item["id"] for item in vector_context if item["type"] == "regulatory"]
+        
+        if not reg_ids:
+            return graph_data
 
-    session.chat_history.append({"role": "user", "content": user_message})
-    session.chat_history.append({"role": "assistant", "content": answer})
-    
-    sources = [{"clause_id": c_id, "distance": r["distance"]} for c_id, r in zip(clause_ids, retrieved)]
-    return {"answer": answer, "sources": sources}
+        with driver.session() as session:
+            for rid in reg_ids:
+                # Fetch pre-computed direct and indirect impacts
+                impacts = self.impact_analyzer._get_direct_impacts(session_id, rid)
+                if impacts:
+                    graph_data.append({
+                        "regulatory_id": rid,
+                        "impacts": impacts
+                    })
+                    
+        return graph_data
+
+    def _build_rag_prompt(
+        self, 
+        query: str, 
+        vector_context: List[Dict[str, Any]], 
+        graph_context: List[Dict[str, Any]],
+        chat_history: List[Dict[str, str]]
+    ) -> str:
+        """
+        Formats the retrieved vector text and structured graph relationships into a single prompt.
+        """
+        # Format Text Context
+        text_context_str = "\n".join([f"- [{c['type'].upper()} {c['id']}]: {c['text']}" for c in vector_context])
+        
+        # Format Graph Context
+        graph_context_str = ""
+        for g in graph_context:
+            graph_context_str += f"\nRegulatory Trigger: {g['regulatory_id']}\n"
+            for impact in g['impacts']:
+                graph_context_str += f"  -> {impact['relationship']} with Policy {impact['policy_id']}. Reasoning: {impact['reasoning']}\n"
+
+        # Format History
+        history_str = ""
+        if chat_history:
+            history_str = "\nRecent Conversation:\n" + "\n".join([f"{msg['role']}: {msg['content']}" for msg in chat_history[-3:]])
+
+        prompt = f"""
+You are an expert regulatory compliance assistant. Answer the user's query using ONLY the provided context.
+
+DOCUMENT CONTEXT (Text Chunks):
+{text_context_str if text_context_str else "None"}
+
+COMPLIANCE GRAPH CONTEXT (Pre-computed Relationships):
+{graph_context_str if graph_context_str else "None"}
+{history_str}
+
+User Query: {query}
+
+Instructions:
+1. Base your answer strictly on the Document Context and Compliance Graph Context provided above.
+2. If the answer is not contained in the context, state clearly that you do not have enough information.
+3. When referencing a policy or regulation, cite its ID.
+4. Utilize the pre-computed relationships and reasoning from the Graph Context to explain compliance statuses.
+"""
+        return prompt.strip()
