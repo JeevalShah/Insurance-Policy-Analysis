@@ -1,6 +1,7 @@
 import axios from 'axios'
 
 const client = axios.create({ baseURL: '/api' })
+const api = axios
 
 export async function createSession() {
   const { data } = await client.post('/session')
@@ -36,4 +37,25 @@ export async function sendChatMessage(sessionId, message) {
 
 export function extractErrorMessage(err) {
   return err?.response?.data?.error || err?.message || 'Something went wrong.'
+}
+
+
+export async function getDocumentRisk(sessionId) {
+  const { data } = await api.get(`/api/risk/${sessionId}`)
+  return data
+}
+
+export async function getClauseRisk(sessionId, clauseId) {
+  const { data } = await api.get(`/api/risk/${sessionId}/${clauseId}`)
+  return data
+}
+
+export async function getCrossfire(sessionId) {
+  const { data } = await api.get(`/api/crossfire/${sessionId}`)
+  return data
+}
+
+export async function getClauseNeighbourhood(sessionId, clauseId) {
+  const { data } = await api.get(`/api/graph/${sessionId}/neighbourhood/${clauseId}`)
+  return data
 }

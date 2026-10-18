@@ -4,7 +4,10 @@ import logging
 from dotenv import load_dotenv
 from neo4j import GraphDatabase
 
-load_dotenv()
+# Load .env from backend directory explicitly so it works regardless of cwd
+_env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env")
+load_dotenv(_env_path)
+load_dotenv()  # Fallback to cwd
 logger = logging.getLogger(__name__)
 
 NODE_REGULATORY = "RegulatoryClause"
@@ -26,7 +29,7 @@ LABEL_TO_REL_TYPE = {
 ALL_COMPLIANCE_RELS = list(LABEL_TO_REL_TYPE.values())
 
 def _get_driver():
-    uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
+    uri = os.getenv("NEO4J_URI", "bolt://127.0.0.1:7687")
     user = os.getenv("NEO4J_USERNAME", "neo4j")
     password = os.getenv("NEO4J_PASSWORD")
     if not password:

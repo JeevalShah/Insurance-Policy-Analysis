@@ -52,10 +52,48 @@ export default function ImpactResults({ result }) {
 
             {(entry.indirect || []).length > 0 && (
               <div className="indirect-footer">
-                <strong>Indirectly affected:</strong>{' '}
-                {entry.indirect.map((id) => (
-                  <span className="indirect-tag" key={id}>Clause {id}</span>
-                ))}
+                <strong>Indirectly affected:</strong>
+                {entry.indirect.map((item, idx) => {
+                  // Support both old format (string ID) and new format (object with impact_chain)
+                  if (typeof item === 'object' && item.impact_chain && item.impact_chain.length > 0) {
+                    return (
+                      <div key={item.clause_id || idx} style={{
+                        margin: '6px 0',
+                        padding: '6px 10px',
+                        backgroundColor: '#F7FAFC',
+                        border: '1px solid var(--line)',
+                        borderRadius: '4px',
+                        fontSize: '12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        gap: '4px',
+                      }}>
+                        {item.impact_chain.map((nodeId, ci) => (
+                          <React.Fragment key={ci}>
+                            <span style={{
+                              padding: '2px 6px',
+                              backgroundColor: ci === item.impact_chain.length - 1 ? '#FED7D7' : '#EBF8FF',
+                              borderRadius: '3px',
+                              fontWeight: ci === item.impact_chain.length - 1 ? '600' : '400',
+                            }}>
+                              {nodeId}
+                            </span>
+                            {ci < item.impact_chain.length - 1 && (
+                              <span style={{ color: '#999', fontSize: '11px' }}>→</span>
+                            )}
+                          </React.Fragment>
+                        ))}
+                        <span style={{ color: '#666', marginLeft: '6px', fontSize: '11px' }}>
+                          ({item.hop_count} hop{item.hop_count > 1 ? 's' : ''})
+                        </span>
+                      </div>
+                    )
+                  }
+                  // Fallback: plain string ID
+                  const id = typeof item === 'string' ? item : item.clause_id || item
+                  return <span className="indirect-tag" key={id}>Clause {id}</span>
+                })}
               </div>
             )}
           </div>

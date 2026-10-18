@@ -14,6 +14,8 @@ from services.chat_service import ChatService
 from services.graph_ingestion import GraphIngestionPipeline
 from reasoning.impact_analysis import ImpactAnalyzer
 from reasoning.graph_store import driver
+from reasoning.risk_scorer import compute_document_risk, compute_clause_risk
+from reasoning.cross_impact import detect_regulatory_crossfire, detect_co_impact_clusters
 from reasoning.dependency_graph import build_dependency_graph
 from embeddings.embedder import PolicyEmbedder
 from parsing import pdf_parsing, docx_parsing
@@ -60,6 +62,10 @@ impact_analyzer = ImpactAnalyzer()
 
 def error_response(message: str, status: int = 400):
     return jsonify({"error": message}), status
+
+
+def internal_error_response():
+    return jsonify({"error": "Internal server error."}), 500
 
 @app.errorhandler(413)
 def too_large(e):
@@ -134,7 +140,7 @@ def upload_documents():
         )
         
         if result.get("status") == "error":
-            return error_response(result.get("message"), 500)
+            return internal_error_response()
             
         return jsonify({
             "session_id": session_id, 
@@ -145,7 +151,7 @@ def upload_documents():
         })
     except Exception as e:
         logger.error(traceback.format_exc())
-        return error_response(f"Failed to process documents: {e}", 500)
+        return internal_error_response()
 
 @app.route("/api/analyze", methods=["POST"])
 def analyze():
@@ -159,10 +165,10 @@ def analyze():
     try:
         result = impact_analyzer.analyze_regulatory_impact(session_id, reg_clause_id)
         if result.get("status") == "error":
-            return error_response(result.get("message"), 500)
+            return internal_error_response()
     except Exception as e:
         logger.error(traceback.format_exc())
-        return error_response(f"Impact analysis failed: {e}", 500)
+        return internal_error_response()
     return jsonify(result)
 
 @app.route("/api/chat", methods=["POST"])
@@ -178,11 +184,11 @@ def chat_endpoint():
     try:
         result = chat_service.generate_response(session_id, message, chat_history)
         if result.get("status") == "error":
-            return error_response(result.get("message"), 500)
+            return internal_error_response()
         return jsonify(result)
     except Exception as e:
         logger.error(traceback.format_exc())
-        return error_response(f"Chat failed: {e}", 500)
+        return internal_error_response()
 
 @app.route("/api/graph/<session_id>", methods=["GET"])
 def get_graph_data(session_id):
@@ -217,7 +223,100 @@ def get_graph_data(session_id):
             return jsonify({"nodes": list(nodes.values()), "links": edges})
     except Exception as e:
         logger.error(f"Graph fetch failed: {e}")
-        return error_response("Failed to fetch graph data", 500)
+        return internal_error_response()
 
+@app.route("/api/risk/<session_id>", methods=["GET"])
+def get_document_risk(session_id):
+    """Returns aggregate compliance risk score for the session."""
+    try:
+        result = compute_document_risk(session_id)
+        if not result:
+            return error_response("No graph data found for this session.", 404)
+        return jsonify(result)
+    except Exception as e:
+        logger.error(f"Risk computation failed: {e}")
+        return internal_error_response()
+
+
+@app.route("/api/risk/<session_id>/<clause_id>", methods=["GET"])
+def get_clause_risk(session_id, clause_id):
+    """Returns risk score for a specific policy clause."""
+    try:
+        result = compute_clause_risk(session_id, clause_id)
+        if not result:
+            return error_response("Clause not found.", 404)
+        return jsonify(result)
+    except Exception as e:
+        logger.error(f"Clause risk computation failed: {e}")
+        return internal_error_response()
+
+
+@app.route("/api/crossfire/<session_id>", methods=["GET"])
+def get_crossfire(session_id):
+    """Finds policy clauses caught between contradictory regulatory demands."""
+    try:
+        crossfire = detect_regulatory_crossfire(session_id)
+        clusters = detect_co_impact_clusters(session_id)
+        return jsonify({
+            "crossfire": crossfire,
+            "co_impact_clusters": clusters,
+        })
+    except Exception as e:
+        logger.error(f"Cross-impact detection failed: {e}")
+        return internal_error_response()
+
+
+@app.route("/api/graph/<session_id>/neighbourhood/<clause_id>", methods=["GET"])
+def get_clause_neighbourhood(session_id, clause_id):
+    """Returns the 1-hop neighbourhood of a specific clause for progressive graph exploration."""
+    try:
+        with driver.session() as session:
+            result = session.run(
+                """
+                MATCH (center {id: $cid, session_id: $sid})
+                OPTIONAL MATCH (center)-[r]-(neighbour)
+                WHERE neighbour.session_id = $sid
+                RETURN center, r, neighbour, labels(center) AS center_labels, 
+                       CASE WHEN neighbour IS NOT NULL THEN labels(neighbour) ELSE [] END AS neighbour_labels
+                """,
+                {"cid": clause_id, "sid": session_id}
+            )
+            
+            nodes, edges = {}, []
+            for record in result:
+                center = record.get("center")
+                r = record.get("r")
+                neighbour = record.get("neighbour")
+                center_labels = record.get("center_labels", [])
+                neighbour_labels = record.get("neighbour_labels", [])
+                
+                if center and center["id"] not in nodes:
+                    nodes[center["id"]] = {
+                        "id": center["id"],
+                        "label": center.get("section", center["id"]),
+                        "group": center_labels[0] if center_labels else "Unknown",
+                        "text": center.get("text", "")[:200],
+                    }
+                if neighbour and neighbour["id"] not in nodes:
+                    nodes[neighbour["id"]] = {
+                        "id": neighbour["id"],
+                        "label": neighbour.get("section", neighbour["id"]),
+                        "group": neighbour_labels[0] if neighbour_labels else "Unknown",
+                        "text": neighbour.get("text", "")[:200],
+                    }
+                
+                if r and center and neighbour:
+                    edge_color = "#C0392B" if r.type == "CONFLICTS_WITH" else "#2ECC71" if r.type == "COMPLIES_WITH" else "#3498DB" if r.type == "SUPPORTS" else "#F39C12" if r.type == "DEPENDS_ON" else "#BDC3C7"
+                    edges.append({
+                        "source": center["id"],
+                        "target": neighbour["id"],
+                        "label": r.type,
+                        "color": edge_color,
+                    })
+            
+            return jsonify({"nodes": list(nodes.values()), "links": edges, "center": clause_id})
+    except Exception as e:
+        logger.error(f"Neighbourhood fetch failed: {e}")
+        return internal_error_response()
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=False)

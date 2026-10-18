@@ -50,7 +50,7 @@ class ImpactAnalyzer:
             logger.error(f"Failed to analyze impact for {reg_clause_id}: {e}")
             return {
                 "status": "error",
-                "message": str(e)
+                "message": "Impact analysis failed."
             }
 
     def _get_direct_impacts(self, session_id: str, reg_clause_id: str) -> List[Dict[str, Any]]:
