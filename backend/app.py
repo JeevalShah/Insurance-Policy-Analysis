@@ -61,7 +61,8 @@ chat_service = ChatService(llm_client=llm_client, session_store=store, embedder=
 impact_analyzer = ImpactAnalyzer()
 
 def error_response(message: str, status: int = 400):
-    return jsonify({"error": message}), status
+    safe_message = "Internal server error." if status >= 500 else message
+    return jsonify({"error": safe_message}), status
 
 @app.errorhandler(413)
 def too_large(e):
