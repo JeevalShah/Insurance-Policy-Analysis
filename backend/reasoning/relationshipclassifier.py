@@ -14,14 +14,12 @@ def _extract_json_array(text: str) -> str:
     """Extracts JSON array content even if wrapped in markdown code fences or preambles."""
     if not isinstance(text, str):
         text = str(text)
-    
-    cleaned = re.sub(r"^```(?:json)?\s*", "", text.strip(), flags=re.IGNORECASE)
-    cleaned = re.sub(r"\s*```$", "", cleaned)
-    
-    match = re.search(r"\[.*\]", cleaned, re.DOTALL)
+        
+    clean_text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text.strip(), flags=re.MULTILINE)
+    match = re.search(r"(\{.*\}|\[.*\])", clean_text, re.DOTALL)
     if match:
-        return match.group(0)
-    return cleaned
+        return match.group(1)
+    return clean_text
 
 
 def _extract_response_content(response: Any) -> str:
@@ -93,7 +91,6 @@ def classify_relationship_batch(
     def _process_chunk(chunk: List[Dict[str, Any]]) -> Dict[str, str]:
         candidate_map = {}
         blocks = []
-
         for c in chunk:
             cid = str(c.get("clause_id", c.get("id", ""))).strip()
             if cid:
@@ -102,22 +99,21 @@ def classify_relationship_batch(
                 raw_text = c.get("text", "")
                 text = raw_text[:1000] + "..." if len(raw_text) > 1000 else raw_text
                 blocks.append(f"[{cid}]\nClause ID: {cid}\nText: {text}")
-
         candidates_block = "\n\n".join(blocks)
-
+        
         prompt = f"""You are an insurance compliance expert.
-
-Regulatory Trigger:
-{truncated_trigger}
+Regulatory Trigger: {truncated_trigger}
 
 Candidate Policy Clauses:
 {candidates_block}
 
-Classify each clause as CONFLICT, COMPLIANT, SUPPORTING, REDUNDANT, or NOT_RELATED.
+Classify each clause as CONFLICT, COMPLIANT, SUPPORTING, REDUNDANT, or NOT_RELATED. 
 Return ONLY a JSON array of objects:
 [
   {{"clause_id": "<id>", "relationship": "<LABEL>"}}
-]"""
+]
+
+Output ONLY valid, raw JSON. Do not include markdown backticks (```), explanations, or conversational filler. Your entire response must be parsable by json.loads."""
 
         try:
             response = ollama.chat(

@@ -33,8 +33,17 @@ app.config["MAX_CONTENT_LENGTH"] = MAX_CONTENT_LENGTH
 class LocalOllamaClient:
     def __init__(self, model_name):
         self.model_name = model_name
-    def predict(self, prompt: str) -> str:
-        res = ollama.chat(model=self.model_name, messages=[{"role": "user", "content": prompt}])
+
+    def predict(self, prompt: str, format: str = None) -> str:
+        payload = {
+            "model": self.model_name,
+            "messages": [{"role": "user", "content": prompt}],
+            "stream": False
+        }
+        if format:
+            payload["format"] = format
+            
+        res = ollama.chat(**payload)
         return res.get("message", {}).get("content", "")
 
 llm_client = LocalOllamaClient(config.CHAT_MODEL)
@@ -159,17 +168,50 @@ def analyze():
     session_id = payload.get("session_id")
     reg_clause_id = payload.get("regulatory_clause_id")
     
-    if not session_id or not reg_clause_id:
-        return error_response("Missing 'session_id' or 'regulatory_clause_id'.")
+    if not session_id:
+        return error_response("Missing 'session_id'.")
         
     try:
-        result = impact_analyzer.analyze_regulatory_impact(session_id, reg_clause_id)
-        if result.get("status") == "error":
-            return internal_error_response()
+        # If specific clause requested, return just that one
+        if reg_clause_id:
+            result = impact_analyzer.analyze_regulatory_impact(session_id, reg_clause_id)
+            if result.get("status") == "error":
+                return internal_error_response()
+            return jsonify(result)
+            
+        # BULK ANALYSIS: Fetch all impacts for the frontend
+        with driver.session() as session:
+            res = session.run(
+                "MATCH (r:RegulatoryClause {session_id: $sid}) RETURN r.id as id, r.text as text", 
+                {"sid": session_id}
+            )
+            triggers = [{"id": rec["id"], "text": rec["text"]} for rec in res]
+            
+        aggregated_results = []
+        for t in triggers:
+            impact = impact_analyzer.analyze_regulatory_impact(session_id, t["id"])
+            
+            # Reshape direct impacts into a dict keyed by policy_id for the frontend
+            direct_dict = {}
+            for d in impact.get("direct_impacts", []):
+                direct_dict[d["policy_id"]] = {
+                    "relationship": d["relationship"],
+                    "text": d["text"],
+                    "reasoning": d["reasoning"]
+                }
+                
+            aggregated_results.append({
+                "trigger_id": t["id"],
+                "trigger_text": t["text"],
+                "direct": direct_dict,
+                "indirect": impact.get("indirect_impacts", [])
+            })
+            
+        return jsonify({"result": aggregated_results})
+        
     except Exception as e:
         logger.error(traceback.format_exc())
         return internal_error_response()
-    return jsonify(result)
 
 @app.route("/api/chat", methods=["POST"])
 def chat_endpoint():

@@ -22,6 +22,8 @@ import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from typing import List, Dict, Any, Optional
+import re
+import json
 
 from reasoning.graph_store import (
     driver,
@@ -254,6 +256,11 @@ class GraphIngestionPipeline:
     ) -> None:
         t0 = time.perf_counter()
         
+        logger.info("Building raw FAISS index for policy candidate retrieval...")
+        vectors, valid_clauses = self.embedder.generate_embeddings(policy_clauses)
+        self.index = self.embedder.build_index(vectors)
+        # ---------------------------------------------------------------
+                 
         # 1. Retrieve candidates for all regulatory clauses
         reg_to_policies = {}
         for reg_clause in regulation_clauses:
@@ -261,15 +268,16 @@ class GraphIngestionPipeline:
             reg_text = reg_clause.get("text", "")
             if not reg_id or not reg_text:
                 continue
-
-            candidates = self._retrieve_candidates(reg_text, policy_clauses)
+            candidates = self._retrieve_candidates(reg_text, valid_clauses) # Use valid_clauses instead of policy_clauses
             report.candidate_pairs_found += len(candidates)
-            
+                         
             if candidates:
                 reg_to_policies[reg_id] = {
                     "reg_text": reg_text,
                     "candidates": candidates
                 }
+        
+        
 
         # 2. Concurrently process LLM batches
         futures = []
@@ -309,23 +317,36 @@ class GraphIngestionPipeline:
         - "relationship": One of [CONFLICTS_WITH, COMPLIES_WITH, SUPPORTS, IS_REDUNDANT, NONE]
         - "reasoning": A 50-word context-grounded explanation for the classification.
         
-        Output ONLY valid JSON.
+        Output ONLY valid, raw JSON. Do not include markdown backticks (```), explanations, or conversational filler. Your entire response must be parsable by json.loads.
         """
         
         edges_written = 0
         try:
-            # Assuming self.classifier has a raw predict or generate method
-            response = self.classifier.llm.predict(prompt).strip() if hasattr(self.classifier, 'llm') else self.classifier.predict(prompt).strip()
+            client = self.classifier.llm if hasattr(self.classifier, 'llm') else self.classifier
             
-            if response.startswith("```json"):
-                response = response.replace("```json", "").replace("```", "").strip()
-            elif response.startswith("```"):
-                response = response.replace("```", "").strip()
-                
-            classifications = json.loads(response)
+            # Force JSON format via the updated client
+            response = client.predict(prompt, format="json").strip()
+            
+            # Sanitize the LLM Output Before Parsing
+            clean_text = re.sub(r"^```(?:json)?\s*|\s*```$", "", response, flags=re.MULTILINE)
+            match = re.search(r"(\{.*\}|\[.*\])", clean_text, re.DOTALL)
+            if match:
+                clean_text = match.group(1)
+            
+            classifications = json.loads(clean_text)
+            
+            # FIX: Ensure classifications is always a list
+            if isinstance(classifications, dict):
+                classifications = [classifications]
+            elif not isinstance(classifications, list):
+                classifications = []
             
             with driver.session() as session:
                 for item in classifications:
+                    # FIX: Guard against string outputs or malformed list items
+                    if not isinstance(item, dict):
+                        continue
+                        
                     raw_label = item.get("relationship", "").upper().strip()
                     rel_type = LABEL_TO_REL_TYPE.get(raw_label, REL_NOT_RELATED)
                     reasoning = item.get("reasoning", "")
@@ -333,7 +354,7 @@ class GraphIngestionPipeline:
                     
                     if not rel_type or rel_type == REL_NOT_RELATED or rel_type == "NOT_RELATED" or not pol_id:
                         continue
-
+                        
                     session.run(
                         f"""
                         MATCH (r:{NODE_REGULATORY} {{id: $rid, session_id: $sid}})
@@ -353,6 +374,7 @@ class GraphIngestionPipeline:
                         }
                     )
                     edges_written += 1
+                    
         except Exception as e:
             logger.error(f"Failed to process batch for reg {reg_id}: {e}")
             raise e

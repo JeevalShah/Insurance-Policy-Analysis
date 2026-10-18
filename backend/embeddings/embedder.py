@@ -123,6 +123,31 @@ class PolicyEmbedder:
             return normalized
         return embedding
 
+    
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        """
+        Langchain-compatible method for embedding multiple text documents.
+        Required by langchain_community.vectorstores.FAISS.
+        """
+        results = [None] * len(texts)
+        
+        with concurrent.futures.ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            def _embed_str(index: int, t: str):
+                # Reuse embed_query to benefit from caching and normalization
+                emb = self.embed_query(t)
+                # Fallback to zero vector if embedding fails to prevent Langchain FAISS from crashing
+                if not emb:
+                    emb = [0.0] * 768 # Default dimensionality for nomic-embed-text
+                return index, emb
+
+            futures = [executor.submit(_embed_str, i, text) for i, text in enumerate(texts)]
+            for future in concurrent.futures.as_completed(futures):
+                index, embedding = future.result()
+                results[index] = embedding
+                
+        return results
+
+    
     def generate_embeddings(self, clauses: List[Dict[str, Any]]) -> Tuple[np.ndarray, List[Dict[str, Any]]]:
         if not clauses:
             logger.warning("Empty clause list passed to generate_embeddings.")
@@ -135,9 +160,10 @@ class PolicyEmbedder:
         t0 = time.perf_counter()
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=self.max_workers) as executor:
-            futures = [executor.submit(self._embed_single, clause) for clause in clauses]
-
-            for future in futures:
+            # Map futures to preserve order if needed, or simply use as_completed
+            futures = {executor.submit(self._embed_single, clause): clause for clause in clauses}
+            
+            for future in concurrent.futures.as_completed(futures):
                 try:
                     result = future.result()
                     if result is not None:
