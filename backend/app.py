@@ -61,8 +61,11 @@ chat_service = ChatService(llm_client=llm_client, session_store=store, embedder=
 impact_analyzer = ImpactAnalyzer()
 
 def error_response(message: str, status: int = 400):
-    safe_message = "Internal server error." if status >= 500 else message
-    return jsonify({"error": safe_message}), status
+    return jsonify({"error": message}), status
+
+
+def internal_error_response():
+    return jsonify({"error": "Internal server error."}), 500
 
 @app.errorhandler(413)
 def too_large(e):
@@ -137,7 +140,7 @@ def upload_documents():
         )
         
         if result.get("status") == "error":
-            return error_response(result.get("message"), 500)
+            return internal_error_response()
             
         return jsonify({
             "session_id": session_id, 
@@ -148,7 +151,7 @@ def upload_documents():
         })
     except Exception as e:
         logger.error(traceback.format_exc())
-        return error_response("Failed to process documents.", 500)
+        return internal_error_response()
 
 @app.route("/api/analyze", methods=["POST"])
 def analyze():
@@ -162,10 +165,10 @@ def analyze():
     try:
         result = impact_analyzer.analyze_regulatory_impact(session_id, reg_clause_id)
         if result.get("status") == "error":
-            return error_response(result.get("message"), 500)
+            return internal_error_response()
     except Exception as e:
         logger.error(traceback.format_exc())
-        return error_response("Impact analysis failed.", 500)
+        return internal_error_response()
     return jsonify(result)
 
 @app.route("/api/chat", methods=["POST"])
@@ -181,11 +184,11 @@ def chat_endpoint():
     try:
         result = chat_service.generate_response(session_id, message, chat_history)
         if result.get("status") == "error":
-            return error_response(result.get("message"), 500)
+            return internal_error_response()
         return jsonify(result)
     except Exception as e:
         logger.error(traceback.format_exc())
-        return error_response("Chat failed.", 500)
+        return internal_error_response()
 
 @app.route("/api/graph/<session_id>", methods=["GET"])
 def get_graph_data(session_id):
@@ -220,7 +223,7 @@ def get_graph_data(session_id):
             return jsonify({"nodes": list(nodes.values()), "links": edges})
     except Exception as e:
         logger.error(f"Graph fetch failed: {e}")
-        return error_response("Failed to fetch graph data", 500)
+        return internal_error_response()
 
 @app.route("/api/risk/<session_id>", methods=["GET"])
 def get_document_risk(session_id):
@@ -232,7 +235,7 @@ def get_document_risk(session_id):
         return jsonify(result)
     except Exception as e:
         logger.error(f"Risk computation failed: {e}")
-        return error_response("Risk computation failed.", 500)
+        return internal_error_response()
 
 
 @app.route("/api/risk/<session_id>/<clause_id>", methods=["GET"])
@@ -245,7 +248,7 @@ def get_clause_risk(session_id, clause_id):
         return jsonify(result)
     except Exception as e:
         logger.error(f"Clause risk computation failed: {e}")
-        return error_response("Clause risk computation failed.", 500)
+        return internal_error_response()
 
 
 @app.route("/api/crossfire/<session_id>", methods=["GET"])
@@ -260,7 +263,7 @@ def get_crossfire(session_id):
         })
     except Exception as e:
         logger.error(f"Cross-impact detection failed: {e}")
-        return error_response("Cross-impact detection failed.", 500)
+        return internal_error_response()
 
 
 @app.route("/api/graph/<session_id>/neighbourhood/<clause_id>", methods=["GET"])
@@ -314,6 +317,6 @@ def get_clause_neighbourhood(session_id, clause_id):
             return jsonify({"nodes": list(nodes.values()), "links": edges, "center": clause_id})
     except Exception as e:
         logger.error(f"Neighbourhood fetch failed: {e}")
-        return error_response("Failed to fetch neighbourhood data", 500)
+        return internal_error_response()
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=False)
