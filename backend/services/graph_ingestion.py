@@ -258,9 +258,14 @@ class GraphIngestionPipeline:
     ) -> None:
         t0 = time.perf_counter()
         
-        logger.info("Building raw FAISS index for policy candidate retrieval...")
+        logger.info("Starting policy embedding generation")
         vectors, valid_clauses = self.embedder.generate_embeddings(policy_clauses)
+        logger.info("Embedding generation complete: %d clauses", len(valid_clauses))
+
+        logger.info("Building FAISS index")
         self.index = self.embedder.build_index(vectors)
+        logger.info("FAISS index built")
+        logger.info("Starting regulatory clause candidate retrieval")
         # ---------------------------------------------------------------
                  
         # 1. Retrieve candidates for all regulatory clauses
@@ -311,7 +316,7 @@ class GraphIngestionPipeline:
         policy_candidates = [
             {
                 'policy_id': c.get('clause_id') or c.get('id'),
-                'text': (c.get('text', '')[:1000] + "...") if len(c.get('text', '')) > 1000 else c.get('text', '')
+                'text': (c.get('text', '')[:700] + "...") if len(c.get('text', '')) > 1000 else c.get('text', '')
             }
             for c in data.get('candidates', [])
         ]
@@ -334,6 +339,9 @@ class GraphIngestionPipeline:
             "minItems": len(policy_candidates),
             "maxItems": len(policy_candidates),
         }
+        # line 347 replace if not working
+        # Policies:
+                #  {json.dumps([{'policy_id': c['clause_id'], 'text': c['text']} for c in data['candidates']], indent=2)}
 
         prompt = f"""
         Compare the regulatory clause with every policy clause. These clauses concern the same subject because they were retrieved as candidates. Classify their substantive relationship; do not label a pair NONE merely because the wording differs.
@@ -343,8 +351,9 @@ class GraphIngestionPipeline:
         Regulation:
         {reg_text_safe}
 
+        
         Policies:
-        {json.dumps([{'policy_id': c['clause_id'], 'text': c['text']} for c in data['candidates']], indent=2)}
+        {json.dumps(policy_candidates, ensure_ascii=False)}
         
         Evaluate each policy against the regulation. Return a structured JSON array. 
         For each policy, provide:

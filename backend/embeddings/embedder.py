@@ -126,7 +126,7 @@ class PolicyEmbedder:
             return cached
 
         self._increment_embed_calls()
-        response = ollama.embeddings(model=self.model_name, prompt=text)
+        response = ollama.embeddings(model=self.model_name, prompt=clean_text)
         embedding = response.get("embedding")
         if embedding:
             normalized = _normalize_vector(np.array(embedding, dtype="float32")).tolist()
