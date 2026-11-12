@@ -1,0 +1,6 @@
+{
+  "experiment_name": "sentra-evaluation",
+  "output_root": "experiments/outputs",
+  "csv_enabled": true,
+  "probe_services_by_default": false
+}

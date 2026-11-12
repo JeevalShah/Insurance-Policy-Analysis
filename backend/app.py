@@ -112,6 +112,15 @@ def parse_files(files) -> list:
                 os.remove(temp_path)
     return parsed_docs
 
+@app.route("/", methods=["GET"])
+def index():
+    return jsonify({
+        "status": "ok",
+        "service": "Sentra Engine Backend API",
+        "health_check": "/api/health",
+        "frontend": "http://localhost:5173"
+    })
+
 @app.route("/api/health", methods=["GET"])
 def health():
     return jsonify({"status": "ok"})

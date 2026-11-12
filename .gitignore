@@ -218,3 +218,59 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# ─── Sentra Engine: runtime artifacts ────────────────────────────────────────
+
+# FAISS / legacy global index dumps
+data/faiss_index.bin
+data/structured_clauses.json
+data/clause_mapping.json
+data/vectorizer.pkl
+*.bin
+*.pkl
+
+# Per-session FAISS + clause caches
+backend/data/sessions/
+data/sessions/
+
+# Uploaded PDFs / DOCX files staged by the backend
+backend/uploads/
+
+# LLM classification SQLite cache
+backend/classification_cache.db
+*.db
+
+# Extracted text scratch files
+data/extracted_text/
+
+# ─── Experiments (all outputs are local only) ─────────────────────────────────
+experiments/outputs/
+# Keep the experiments source code but ignore generated run artifacts
+experiments/**/*.jsonl
+experiments/**/*.csv
+experiments/**/environment.json
+experiments/**/summary.json
+experiments/**/report_table.md
+experiments/**/report_table.tex
+experiments/**/traversal_config.json
+
+# ─── Generated paper figures ─────────────────────────────────────────────────
+scripts/figures/
+scripts/**/*.png
+
+# ─── OS / editor artifacts ───────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── Node / frontend ─────────────────────────────────────────────────────────
+node_modules/
+frontend/node_modules/
+package-lock.json
+
+# ─── Secrets / environment ───────────────────────────────────────────────────
+.env
+backend/.env
+# Keep the example file
+!backend/.env.example
+

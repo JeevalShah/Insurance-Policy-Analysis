@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sentra.local/schemas/gold-pair-1.0.json",
+  "title": "Sentra regulatory-policy gold pair",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "pair_id",
+    "regulatory_clause_id",
+    "policy_clause_id",
+    "regulatory_text",
+    "policy_text",
+    "pair_source",
+    "annotator_labels",
+    "adjudicated_label",
+    "adjudication_status"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "pair_id": {"type": "string", "minLength": 1},
+    "regulatory_clause_id": {"type": "string", "minLength": 1},
+    "policy_clause_id": {"type": "string", "minLength": 1},
+    "regulatory_text": {"type": "string", "minLength": 1},
+    "policy_text": {"type": "string", "minLength": 1},
+    "pair_source": {
+      "type": "string",
+      "enum": ["retrieved_candidate", "hard_negative", "random_negative", "other"]
+    },
+    "annotator_ids": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "annotator_labels": {
+      "type": "object",
+      "propertyNames": {"pattern": "^[A-Za-z0-9_.-]+$"},
+      "additionalProperties": {
+        "type": "string",
+        "enum": ["CONFLICT", "COMPLIANT", "SUPPORTING", "REDUNDANT", "NOT_RELATED"]
+      }
+    },
+    "adjudicated_label": {
+      "oneOf": [
+        {"type": "null"},
+        {"type": "string", "enum": ["CONFLICT", "COMPLIANT", "SUPPORTING", "REDUNDANT", "NOT_RELATED"]}
+      ]
+    },
+    "adjudication_status": {"type": "string", "enum": ["pending", "adjudicated"]},
+    "retrieval": {
+      "type": "object",
+      "properties": {
+        "retrieved": {"type": ["boolean", "null"]},
+        "retrieval_rank": {"type": ["integer", "null"], "minimum": 1},
+        "faiss_distance": {"type": ["number", "null"], "minimum": 0}
+      },
+      "additionalProperties": false
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"adjudication_status": {"const": "adjudicated"}}},
+      "then": {"properties": {"adjudicated_label": {"type": "string"}}}
+    },
+    {
+      "if": {"properties": {"adjudication_status": {"const": "pending"}}},
+      "then": {"properties": {"adjudicated_label": {"type": "null"}}}
+    }
+  ],
+  "additionalProperties": false
+}

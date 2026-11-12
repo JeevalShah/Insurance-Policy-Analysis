@@ -108,11 +108,45 @@ class GraphIngestionPipeline:
         self.top_k              = top_k
         self.model              = model
         self.distance_threshold = distance_threshold
+        # Set only by the opt-in experiments.instrumented_app launcher. When
+        # absent, production writes follow the existing run path unchanged.
+        self.experiment_recorder = None
         
         # Tune Concurrency Limits: Decouple lightweight tasks from heavy LLM generation
         self.embedding_executor = ThreadPoolExecutor(max_workers=max_embedding_workers)
         self.llm_executor       = ThreadPoolExecutor(max_workers=max_llm_workers)
         ensure_indexes()
+
+    def _run_experiment_write(self, session, stage: str, query: str, parameters: Dict[str, Any]):
+        """Run a write query, consuming its result only in instrumented mode."""
+        recorder = self.experiment_recorder
+        if recorder is None:
+            return session.run(query, parameters)
+
+        started_ns = time.perf_counter_ns()
+        try:
+            result = session.run(query, parameters)
+            summary = result.consume()
+            metrics = {
+                "duration_ns": time.perf_counter_ns() - started_ns,
+                "query_count": 1,
+                "failure_count": 0,
+            }
+            server_ms = getattr(summary, "result_consumed_after", None)
+            if server_ms is not None:
+                metrics["server_result_consumed_ms"] = server_ms
+            recorder.record(stage, "write_complete", metrics)
+            return result
+        except Exception:
+            try:
+                recorder.record(stage, "write_failed", {
+                    "duration_ns": time.perf_counter_ns() - started_ns,
+                    "query_count": 1,
+                    "failure_count": 1,
+                })
+            except Exception:
+                logger.exception("Experiment timing record failed for %s", stage)
+            raise
 
     def ingest(
         self,
@@ -194,7 +228,9 @@ class GraphIngestionPipeline:
                   n.section    = item.section
             """
             with driver.session() as session:
-                session.run(cypher, {"batch": batch, "sid": session_id})
+                self._run_experiment_write(
+                    session, "neo4j_node_writes", cypher, {"batch": batch, "sid": session_id}
+                )
 
         elapsed = time.perf_counter() - t0
         report.regulatory_clauses_written = written
@@ -225,7 +261,9 @@ class GraphIngestionPipeline:
                   n.section    = item.section
             """
             with driver.session() as session:
-                session.run(cypher, {"batch": batch, "sid": session_id})
+                self._run_experiment_write(
+                    session, "neo4j_node_writes", cypher, {"batch": batch, "sid": session_id}
+                )
 
         elapsed = time.perf_counter() - t0
         report.policy_clauses_written = written
@@ -243,7 +281,9 @@ class GraphIngestionPipeline:
             MERGE (s)-[:{EDGE_DEPENDS_ON}]->(t)
             """
             with driver.session() as session:
-                session.run(cypher, {"pairs": pairs, "sid": session_id})
+                self._run_experiment_write(
+                    session, "neo4j_dependency_edge_writes", cypher, {"pairs": pairs, "sid": session_id}
+                )
 
         elapsed = time.perf_counter() - t0
         report.dependency_edges_written = written
@@ -439,23 +479,24 @@ class GraphIngestionPipeline:
                     if not rel_type or not pol_id or pol_id not in candidate_ids:
                         continue
                         
-                    session.run(
-                        f"""
+                    query = f"""
                         MATCH (r:{NODE_REGULATORY} {{id: $rid, session_id: $sid}})
                         MATCH (p:{NODE_POLICY}     {{id: $pid, session_id: $sid}})
                         MERGE (r)-[e:{rel_type}]->(p)
                         SET   e.classified_at = $ts,
                               e.model         = $model,
                               e.reasoning     = $reasoning
-                        """,
-                        {
-                            "rid": reg_id,
-                            "sid": session_id,
-                            "pid": pol_id,
-                            "ts": int(time.time()),
-                            "model": self.model,
-                            "reasoning": reasoning
-                        }
+                        """
+                    parameters = {
+                        "rid": reg_id,
+                        "sid": session_id,
+                        "pid": pol_id,
+                        "ts": int(time.time()),
+                        "model": self.model,
+                        "reasoning": reasoning
+                    }
+                    self._run_experiment_write(
+                        session, "neo4j_compliance_edge_writes", query, parameters
                     )
                     edges_written += 1
                     if rel_type == REL_NOT_RELATED:
