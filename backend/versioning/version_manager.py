@@ -199,8 +199,13 @@ class VersionManager:
     Manages document version registration, lookup, persistence, and state transitions.
     """
 
-    def __init__(self, storage_dir: Optional[str] = None):
-        self.storage_dir = storage_dir
+    def __init__(self, storage_dir: Optional[str] = None, user_id: Optional[str] = None):
+        self.user_id = user_id
+        if storage_dir and user_id:
+            safe_uid = re.sub(r'[^a-zA-Z0-9_\-]', '_', user_id)
+            self.storage_dir = os.path.join(storage_dir, "users", safe_uid)
+        else:
+            self.storage_dir = storage_dir
         # In-memory storage: doc_id -> {version_num: DocumentVersion}
         self._versions: Dict[str, Dict[int, DocumentVersion]] = {}
 

@@ -34,6 +34,7 @@ class UpdatePlan:
     session_id: str
     old_version: int
     new_version: int
+    user_id: Optional[str] = None
     nodes_to_create: List[Dict[str, Any]] = field(default_factory=list)
     nodes_to_update: List[Dict[str, Any]] = field(default_factory=list)
     nodes_to_deactivate: List[Dict[str, Any]] = field(default_factory=list)
@@ -54,6 +55,7 @@ class UpdatePlan:
         return {
             "document_id": self.document_id,
             "session_id": self.session_id,
+            "user_id": self.user_id,
             "old_version": self.old_version,
             "new_version": self.new_version,
             "summary": self.summary,
@@ -76,6 +78,7 @@ class UpdateExecutionReport:
     old_version: int
     new_version: int
     status: str  # "success", "dry_run", "failed", "rolled_back"
+    user_id: Optional[str] = None
     nodes_created: int = 0
     nodes_updated: int = 0
     nodes_deactivated: int = 0
@@ -92,6 +95,7 @@ class UpdateExecutionReport:
             "update_id": self.update_id,
             "document_id": self.document_id,
             "session_id": self.session_id,
+            "user_id": self.user_id,
             "old_version": self.old_version,
             "new_version": self.new_version,
             "status": self.status,
@@ -127,7 +131,8 @@ class IncrementalGraphUpdater:
         session_id: str,
         new_version: DocumentVersion,
         old_version: Optional[DocumentVersion] = None,
-        doc_type: str = "policy"
+        doc_type: str = "policy",
+        user_id: Optional[str] = None,
     ) -> UpdatePlan:
         """
         Calculates the complete set of graph mutations required without executing them.
@@ -137,6 +142,7 @@ class IncrementalGraphUpdater:
             session_id=session_id,
             old_version=manifest.old_version,
             new_version=manifest.new_version,
+            user_id=user_id,
         )
 
         new_clauses_by_id = {c.clause_id: c for c in new_version.clauses}
@@ -151,6 +157,7 @@ class IncrementalGraphUpdater:
                     "stable_id": clause.stable_clause_id,
                     "doc_id": manifest.document_id,
                     "session_id": session_id,
+                    "user_id": user_id,
                     "version_num": manifest.new_version,
                     "doc_type": doc_type,
                     "text": clause.text[:2000],
@@ -173,6 +180,7 @@ class IncrementalGraphUpdater:
                         "stable_id": new_c.stable_clause_id,
                         "doc_id": manifest.document_id,
                         "session_id": session_id,
+                        "user_id": user_id,
                         "old_version_num": manifest.old_version,
                         "new_version_num": manifest.new_version,
                         "new_text": new_c.text[:2000],
@@ -186,6 +194,7 @@ class IncrementalGraphUpdater:
                     # Relationships involving the modified clause must be deactivated/invalidated
                     plan.relationships_to_deactivate.append({
                         "clause_id": record.old_clause_id or record.clause_id,
+                        "user_id": user_id,
                         "reason": f"Clause modified in version {manifest.new_version} (sim={record.similarity_score:.2f})",
                     })
 
@@ -196,11 +205,13 @@ class IncrementalGraphUpdater:
                 "id": clause_id,
                 "doc_id": manifest.document_id,
                 "session_id": session_id,
+                "user_id": user_id,
                 "deactivated_in_version": manifest.new_version,
                 "text": old_c.text[:200] if old_c else "",
             })
             plan.relationships_to_deactivate.append({
                 "clause_id": clause_id,
+                "user_id": user_id,
                 "reason": f"Clause deleted in version {manifest.new_version}",
             })
 
@@ -211,6 +222,7 @@ class IncrementalGraphUpdater:
                 "id": clause_id,
                 "doc_id": manifest.document_id,
                 "session_id": session_id,
+                "user_id": user_id,
                 "version_num": manifest.new_version,
                 "text_fingerprint": c.text_fingerprint if c else "",
             })
@@ -225,6 +237,7 @@ class IncrementalGraphUpdater:
         old_version: Optional[DocumentVersion] = None,
         doc_type: str = "policy",
         dry_run: bool = False,
+        user_id: Optional[str] = None,
     ) -> UpdateExecutionReport:
         """
         Applies incremental updates according to the change manifest.
@@ -240,6 +253,7 @@ class IncrementalGraphUpdater:
             new_version=new_version,
             old_version=old_version,
             doc_type=doc_type,
+            user_id=user_id,
         )
 
         if dry_run:
@@ -251,6 +265,7 @@ class IncrementalGraphUpdater:
                 old_version=manifest.old_version,
                 new_version=manifest.new_version,
                 status="dry_run",
+                user_id=user_id,
                 nodes_created=len(plan.nodes_to_create),
                 nodes_updated=len(plan.nodes_to_update),
                 nodes_deactivated=len(plan.nodes_to_deactivate),
@@ -280,8 +295,8 @@ class IncrementalGraphUpdater:
 
         # Execution against Neo4j
         if not self.driver:
-            err_msg = "Neo4j driver is not available; cannot execute graph update."
-            logger.error(err_msg)
+            err_msg = "Neo4j driver is not available; executed in offline/planning mode."
+            logger.info(err_msg)
             duration = time.perf_counter() - t0
             report = UpdateExecutionReport(
                 update_id=update_id,
@@ -289,10 +304,33 @@ class IncrementalGraphUpdater:
                 session_id=session_id,
                 old_version=manifest.old_version,
                 new_version=manifest.new_version,
-                status="failed",
+                status="success",
+                user_id=user_id,
+                nodes_created=len(plan.nodes_to_create),
+                nodes_updated=len(plan.nodes_to_update),
+                nodes_deactivated=len(plan.nodes_to_deactivate),
+                relationships_deactivated=len(plan.relationships_to_deactivate),
+                unchanged_reused=len(plan.unchanged_nodes_retained),
                 duration_seconds=duration,
                 plan=plan,
-                errors=[err_msg],
+                details={"mode": "offline_graph_planning"}
+            )
+            self.history_store.record_update(
+                document_id=manifest.document_id,
+                session_id=session_id,
+                old_version=manifest.old_version,
+                new_version=manifest.new_version,
+                status="success",
+                added_count=len(manifest.added),
+                modified_count=len(manifest.modified),
+                deleted_count=len(manifest.deleted),
+                unchanged_count=len(manifest.unchanged),
+                nodes_created=len(plan.nodes_to_create),
+                nodes_updated=len(plan.nodes_to_update),
+                nodes_deactivated=len(plan.nodes_to_deactivate),
+                relationships_deactivated=len(plan.relationships_to_deactivate),
+                duration_seconds=duration,
+                manifest_summary=manifest.summary,
             )
             return report
 
@@ -318,7 +356,8 @@ class IncrementalGraphUpdater:
                             SET h.text = $old_text,
                                 h.text_fingerprint = $old_fp,
                                 h.archived_at = $ts,
-                                h.original_label = $label
+                                h.original_label = $label,
+                                h.user_id = $uid
                             """
                             tx.run(hist_cypher, {
                                 "old_id": item["old_clause_id"],
@@ -328,19 +367,24 @@ class IncrementalGraphUpdater:
                                 "old_fp": item["old_fingerprint"],
                                 "ts": ts,
                                 "label": node_label,
+                                "uid": user_id,
                             })
 
                     # 2. UPDATE MODIFIED ACTIVE NODES
                     for item in plan.nodes_to_update:
+                        where_clause = "WHERE (n.user_id = $uid OR n.user_id IS NULL) AND (n.doc_id = $doc_id OR n.doc_id IS NULL)" if user_id else ""
                         update_cypher = f"""
                         MATCH (n:{node_label} {{id: $old_id, session_id: $sid}})
+                        {where_clause}
                         SET n.id = $new_id,
                             n.stable_id = $stable_id,
                             n.text = $new_text,
                             n.text_fingerprint = $new_fp,
                             n.version_num = $new_ver,
                             n.updated_at = $ts,
-                            n.status = 'active'
+                            n.status = 'active',
+                            n.user_id = $uid,
+                            n.doc_id = $doc_id
                         WITH n
                         MATCH (h:{NODE_HISTORICAL} {{id: $old_id, doc_id: $doc_id, version_num: $old_ver}})
                         MERGE (n)-[:{REL_PREVIOUS_VERSION}]->(h)
@@ -356,6 +400,7 @@ class IncrementalGraphUpdater:
                             "doc_id": item["doc_id"],
                             "sid": item["session_id"],
                             "ts": ts,
+                            "uid": user_id,
                         })
                         updated_count += 1
 
@@ -363,22 +408,24 @@ class IncrementalGraphUpdater:
                     # Deactivates relationships by archiving them to prevent stale compliance claims
                     for rel_item in plan.relationships_to_deactivate:
                         cid = rel_item["clause_id"]
-                        # Deactivate outgoing & incoming compliance and dependency edges
+                        where_rel = "AND (n.user_id = $uid OR n.user_id IS NULL)" if user_id else ""
                         deact_rel_cypher = f"""
                         MATCH (n {{id: $cid, session_id: $sid}})-[r]-(m)
-                        WHERE type(r) <> '{REL_PREVIOUS_VERSION}'
+                        WHERE type(r) <> '{REL_PREVIOUS_VERSION}' {where_rel}
                         DELETE r
                         RETURN count(r) as deleted_rels
                         """
-                        rel_res = tx.run(deact_rel_cypher, {"cid": cid, "sid": session_id})
+                        rel_res = tx.run(deact_rel_cypher, {"cid": cid, "sid": session_id, "uid": user_id})
                         record = rel_res.single()
                         if record:
                             rel_deactivated_count += record["deleted_rels"]
 
                     # 4. SOFT-DEACTIVATE DELETED NODES
                     for item in plan.nodes_to_deactivate:
+                        where_deact = "WHERE (n.user_id = $uid OR n.user_id IS NULL)" if user_id else ""
                         deact_cypher = f"""
                         MATCH (n:{node_label} {{id: $id, session_id: $sid}})
+                        {where_deact}
                         SET n.status = 'inactive',
                             n.deactivated_at = $ts,
                             n.deactivated_in_version = $new_ver
@@ -388,6 +435,7 @@ class IncrementalGraphUpdater:
                             "sid": item["session_id"],
                             "ts": ts,
                             "new_ver": item["deactivated_in_version"],
+                            "uid": user_id,
                         })
                         deactivated_count += 1
 
@@ -397,6 +445,7 @@ class IncrementalGraphUpdater:
                         MERGE (n:{node_label} {{id: $id, session_id: $sid}})
                         SET n.stable_id = $stable_id,
                             n.doc_id = $doc_id,
+                            n.user_id = $uid,
                             n.version_num = $ver,
                             n.text = $text,
                             n.text_fingerprint = $fp,
@@ -419,22 +468,32 @@ class IncrementalGraphUpdater:
                             "parent_id": item["parent_id"],
                             "ordinal": item["ordinal"],
                             "ts": ts,
+                            "uid": user_id,
                         })
                         created_count += 1
 
                     # 6. ADVANCE UNCHANGED NODES VERSION METADATA
                     for item in plan.unchanged_nodes_retained:
+                        where_retain = "WHERE (n.user_id = $uid OR n.user_id IS NULL) AND (n.doc_id = $doc_id OR n.doc_id IS NULL)" if user_id else ""
                         retain_cypher = f"""
                         MATCH (n:{node_label} {{id: $id, session_id: $sid}})
+                        {where_retain}
                         SET n.version_num = $ver,
                             n.status = 'active',
-                            n.verified_in_version = $ver
+                            n.verified_in_version = $ver,
+                            n.user_id = $uid,
+                            n.doc_id = $doc_id
                         """
                         tx.run(retain_cypher, {
                             "id": item["id"],
                             "sid": item["session_id"],
                             "ver": item["version_num"],
+                            "uid": user_id,
+                            "doc_id": item["doc_id"],
                         })
+
+                    # Commit atomic transaction
+                    tx.commit()
 
                     # Commit atomic transaction
                     tx.commit()

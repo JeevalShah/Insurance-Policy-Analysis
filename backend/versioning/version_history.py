@@ -101,8 +101,13 @@ class VersionHistoryStore:
     Stores and retrieves audit records for document updates and version history.
     """
 
-    def __init__(self, storage_dir: Optional[str] = None):
-        self.storage_dir = storage_dir
+    def __init__(self, storage_dir: Optional[str] = None, user_id: Optional[str] = None):
+        self.user_id = user_id
+        if storage_dir and user_id:
+            safe_uid = re.sub(r'[^a-zA-Z0-9_\-]', '_', user_id)
+            self.storage_dir = os.path.join(storage_dir, "users", safe_uid)
+        else:
+            self.storage_dir = storage_dir
         # In-memory map: doc_id -> List[UpdateRecord]
         self._history: Dict[str, List[UpdateRecord]] = {}
 

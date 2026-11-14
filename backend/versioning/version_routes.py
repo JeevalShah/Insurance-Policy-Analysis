@@ -34,18 +34,140 @@ evaluator = IncrementalEvaluator(reprocessor=reprocessor)
 rollback_mgr = RollbackManager(version_manager=version_manager, history_store=history_store)
 
 
-def get_updater():
+"""
+version_routes.py
+
+Blueprint providing REST endpoints and a comprehensive visual interactive web inspector
+for version-aware knowledge graph maintenance in Sentra Engine.
+Supports authenticated multi-user operations and dynamic version-aware workflows.
+"""
+
+from flask import Blueprint, request, jsonify, render_template_string, g
+import json
+import logging
+import os
+import time
+from werkzeug.utils import secure_filename
+
+import config
+from .document_identity import resolve_document_identity, DocumentType
+from .version_manager import VersionManager, VersionStatus
+from .change_detector import ChangeDetector
+from .version_history import VersionHistoryStore
+from .incremental_graph_updater import IncrementalGraphUpdater
+from .relationship_invalidator import RelationshipInvalidator
+from .targeted_reprocessor import TargetedReprocessor
+from .rollback_manager import RollbackManager
+from .evaluation_benchmark import IncrementalEvaluator
+from services.auth_service import require_auth, optional_auth
+from services.user_document_registry import document_registry
+from services.version_pipeline_service import version_pipeline
+
+logger = logging.getLogger(__name__)
+
+version_bp = Blueprint("versioning", __name__)
+
+# Fallback singletons for unauthenticated demo inspection
+version_manager = VersionManager(storage_dir="data/versions")
+history_store = VersionHistoryStore(storage_dir="data/version_history")
+detector = ChangeDetector()
+invalidator = RelationshipInvalidator()
+reprocessor = TargetedReprocessor(invalidator=invalidator)
+evaluator = IncrementalEvaluator(reprocessor=reprocessor)
+rollback_mgr = RollbackManager(version_manager=version_manager, history_store=history_store)
+
+
+def get_updater(user_id: str = None):
     try:
         from reasoning.graph_store import driver
     except ImportError:
         driver = None
-    return IncrementalGraphUpdater(driver=driver, history_store=history_store)
+    hs = version_pipeline.get_user_history_store(user_id) if user_id else history_store
+    return IncrementalGraphUpdater(driver=driver, history_store=hs)
+
+
+# --------------------------------------------------------------------------
+# USER-SCOPED DYNAMIC DOCUMENT & VERSION ROUTES
+# --------------------------------------------------------------------------
+
+@version_bp.route("/documents", methods=["GET"])
+@require_auth
+def list_user_documents():
+    """Lists all registered documents belonging to the authenticated user."""
+    doc_type = request.args.get("doc_type")
+    docs = document_registry.list_user_documents(g.user_id, doc_type=doc_type)
+    return jsonify({
+        "status": "success",
+        "user_id": g.user_id,
+        "count": len(docs),
+        "documents": docs
+    })
+
+
+@version_bp.route("/upload", methods=["POST"])
+@require_auth
+def upload_version_document():
+    """
+    Uploads a document for version-aware processing:
+    - Automatically resolves document identity
+    - Detects if document is new (Scenario A), unchanged (Scenario B), or modified (Scenario C)
+    - Reuses existing graph nodes/embeddings on zero-change re-uploads
+    - Executes targeted incremental graph update on modifications
+    """
+    if "file" not in request.files:
+        return jsonify({"error": "No 'file' part provided in upload form."}), 400
+
+    file = request.files["file"]
+    if not file or not file.filename:
+        return jsonify({"error": "Empty or missing filename."}), 400
+
+    filename = secure_filename(file.filename.lower())
+    doc_type = request.form.get("doc_type", "policy")
+    explicit_doc_id = request.form.get("doc_id")
+    target_doc_id = request.form.get("target_doc_id")
+    session_id = request.form.get("session_id")
+    allow_unconfirmed = request.form.get("allow_unconfirmed", "false").lower() in ("true", "1")
+
+    temp_path = os.path.join(config.UPLOAD_DIR, f"{g.user_id}_{filename}")
+    try:
+        file.save(temp_path)
+        raw_clauses, full_text = version_pipeline.parse_document_content(temp_path, filename)
+    finally:
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+
+    if not raw_clauses:
+        return jsonify({"error": f"Failed to extract any clauses from '{filename}'."}), 400
+
+    try:
+        result = version_pipeline.process_version_upload(
+            user_id=g.user_id,
+            raw_clauses=raw_clauses,
+            filename=filename,
+            full_text=full_text,
+            doc_type=doc_type,
+            explicit_doc_id=explicit_doc_id,
+            target_doc_id=target_doc_id,
+            session_id=session_id,
+            allow_unconfirmed=allow_unconfirmed,
+        )
+        return jsonify(result), 200
+    except Exception as e:
+        logger.exception(f"Version upload error: {e}")
+        return jsonify({"error": str(e)}), 400
 
 
 @version_bp.route("/history/<doc_id>", methods=["GET"])
+@optional_auth
 def get_document_history(doc_id):
     """Returns the complete audit log of version updates for a document."""
-    history = history_store.get_history(doc_id)
+    user_id = g.user_id
+    if user_id:
+        hs = version_pipeline.get_user_history_store(user_id)
+        history = hs.get_history(doc_id)
+    else:
+        history = history_store.get_history(doc_id)
+
     return jsonify({
         "document_id": doc_id,
         "update_count": len(history),
@@ -54,9 +176,16 @@ def get_document_history(doc_id):
 
 
 @version_bp.route("/versions/<doc_id>", methods=["GET"])
+@optional_auth
 def get_document_versions(doc_id):
     """Returns all registered snapshots of a document."""
-    versions = version_manager.list_versions(doc_id)
+    user_id = g.user_id
+    if user_id:
+        vm = version_pipeline.get_user_version_manager(user_id)
+        versions = vm.list_versions(doc_id)
+    else:
+        versions = version_manager.list_versions(doc_id)
+
     return jsonify({
         "document_id": doc_id,
         "version_count": len(versions),
@@ -65,10 +194,11 @@ def get_document_versions(doc_id):
 
 
 @version_bp.route("/diff", methods=["POST"])
+@optional_auth
 def compute_version_diff():
     """Computes and returns the Change Manifest between two versions."""
     payload = request.get_json(silent=True) or {}
-    doc_id = payload.get("doc_id", "DOC_DEFAULT")
+    doc_id = payload.get("doc_id")
     old_version_num = payload.get("old_version", 1)
     new_version_num = payload.get("new_version", 2)
 
@@ -77,7 +207,7 @@ def compute_version_diff():
 
     if old_clauses and new_clauses:
         result = detector.compare_raw_clauses(
-            doc_id=doc_id,
+            doc_id=doc_id or "DOC_COMPARISON",
             old_raw_clauses=old_clauses,
             new_raw_clauses=new_clauses,
             old_version_num=old_version_num,
@@ -85,50 +215,124 @@ def compute_version_diff():
         )
         return jsonify(result.manifest.to_dict())
 
-    old_ver = version_manager.get_version(doc_id, old_version_num)
-    new_ver = version_manager.get_version(doc_id, new_version_num)
+    if not doc_id:
+        return jsonify({"error": "Missing 'doc_id' parameter."}), 400
+
+    user_id = g.user_id
+    vm = version_pipeline.get_user_version_manager(user_id) if user_id else version_manager
+
+    old_ver = vm.get_version(doc_id, old_version_num)
+    new_ver = vm.get_version(doc_id, new_version_num)
 
     if not old_ver or not new_ver:
         return jsonify({
-            "error": f"Versions not found for doc '{doc_id}'."
+            "error": f"Versions v{old_version_num} and/or v{new_version_num} not found for doc '{doc_id}'."
         }), 404
 
     result = detector.detect_changes(old_ver, new_ver)
     return jsonify(result.manifest.to_dict())
 
 
-@version_bp.route("/update", methods=["POST"])
-def apply_incremental_update():
-    """Executes dry-run or live incremental graph update for a document."""
+@version_bp.route("/rollback", methods=["POST"])
+@optional_auth
+def execute_version_rollback():
+    """Executes safe rollback to a target version without deleting session data."""
     payload = request.get_json(silent=True) or {}
-    doc_id = payload.get("doc_id", "MERIDIAN_RULEBOOK")
-    session_id = payload.get("session_id", "demo_session")
-    old_version_num = payload.get("old_version", 2026)
-    new_version_num = payload.get("new_version", 2027)
+    doc_id = payload.get("doc_id")
+    target_version_num = payload.get("target_version")
+    session_id = payload.get("session_id", "rollback_session")
     dry_run = payload.get("dry_run", True)
 
-    old_ver = version_manager.get_version(doc_id, old_version_num)
-    new_ver = version_manager.get_version(doc_id, new_version_num)
+    if not doc_id or target_version_num is None:
+        return jsonify({"error": "Missing 'doc_id' or 'target_version'."}), 400
 
-    if not old_ver or not new_ver:
-        # Register demo sample versions if not already registered
-        _seed_demo_versions()
-        old_ver = version_manager.get_version(doc_id, old_version_num)
-        new_ver = version_manager.get_version(doc_id, new_version_num)
+    user_id = g.user_id
+    if user_id:
+        report = version_pipeline.execute_user_rollback(
+            user_id=user_id,
+            document_id=doc_id,
+            target_version_num=int(target_version_num),
+            session_id=session_id,
+            dry_run=dry_run,
+        )
+        return jsonify(report)
+    else:
+        report = rollback_mgr.execute_rollback(
+            document_id=doc_id,
+            target_version_num=int(target_version_num),
+            session_id=session_id,
+            dry_run=dry_run,
+        )
+        return jsonify(report.to_dict())
 
-    detection = detector.detect_changes(old_ver, new_ver)
-    updater = get_updater()
-    report = updater.apply_update(
-        manifest=detection.manifest,
-        session_id=session_id,
-        new_version=new_ver,
-        old_version=old_ver,
-        dry_run=dry_run,
-    )
-    return jsonify(report.to_dict())
+
+@version_bp.route("/graph/<doc_id>", methods=["GET"])
+@optional_auth
+def get_version_graph(doc_id):
+    """Returns nodes and edges for a specific document and active version."""
+    user_id = g.user_id
+    try:
+        from reasoning.graph_store import driver
+        if not driver:
+            return jsonify({"nodes": [], "links": [], "message": "Graph driver offline."})
+
+        where_user = "AND (n.user_id = $uid OR n.user_id IS NULL)" if user_id else ""
+        query = f"""
+        MATCH (n) WHERE n.doc_id = $doc_id {where_user}
+        OPTIONAL MATCH (n)-[r]->(m) WHERE m.doc_id = $doc_id
+        RETURN n, r, m
+        """
+        with driver.session() as session:
+            result = session.run(query, {"doc_id": doc_id, "uid": user_id})
+            nodes, edges = {}, []
+            for rec in result:
+                n, r, m = rec.get("n"), rec.get("r"), rec.get("m")
+                if n and n.get("id") not in nodes:
+                    n_labels = list(n.labels)
+                    lbl = n_labels[0] if n_labels else "Clause"
+                    nodes[n["id"]] = {
+                        "id": n["id"],
+                        "clause_id": n["id"],
+                        "label": f"{lbl} {n.get('section') or n['id']}",
+                        "group": lbl,
+                        "status": n.get("status", "active"),
+                        "version_num": n.get("version_num", 1),
+                        "text": n.get("text", "")[:200],
+                    }
+                if m and m.get("id") not in nodes:
+                    m_labels = list(m.labels)
+                    lbl = m_labels[0] if m_labels else "Clause"
+                    nodes[m["id"]] = {
+                        "id": m["id"],
+                        "clause_id": m["id"],
+                        "label": f"{lbl} {m.get('section') or m['id']}",
+                        "group": lbl,
+                        "status": m.get("status", "active"),
+                        "version_num": m.get("version_num", 1),
+                        "text": m.get("text", "")[:200],
+                    }
+                if r and n and m:
+                    edges.append({
+                        "source": n["id"],
+                        "target": m["id"],
+                        "label": r.type,
+                        "color": "#C0392B" if r.type == "CONFLICTS_WITH" else "#2ECC71" if r.type == "COMPLIES_WITH" else "#3498DB" if r.type == "SUPPORTS" else "#F39C12" if r.type == "DEPENDS_ON" else "#BDC3C7"
+                    })
+
+            return jsonify({
+                "document_id": doc_id,
+                "node_count": len(nodes),
+                "edge_count": len(edges),
+                "nodes": list(nodes.values()),
+                "links": edges
+            })
+    except Exception as e:
+        logger.error(f"Failed to fetch version graph for {doc_id}: {e}")
+        return jsonify({"nodes": [], "links": [], "error": str(e)})
 
 
 @version_bp.route("/evaluate", methods=["POST"])
+@optional_auth
 def evaluate_comparison():
     """Executes side-by-side benchmark comparing full reconstruction against incremental update."""
     payload = request.get_json(silent=True) or {}
@@ -136,13 +340,20 @@ def evaluate_comparison():
     old_version_num = payload.get("old_version", 2026)
     new_version_num = payload.get("new_version", 2027)
 
-    old_ver = version_manager.get_version(doc_id, old_version_num)
-    new_ver = version_manager.get_version(doc_id, new_version_num)
+    user_id = g.user_id
+    vm = version_pipeline.get_user_version_manager(user_id) if user_id else version_manager
+
+    old_ver = vm.get_version(doc_id, old_version_num)
+    new_ver = vm.get_version(doc_id, new_version_num)
 
     if not old_ver or not new_ver:
-        _seed_demo_versions()
-        old_ver = version_manager.get_version(doc_id, old_version_num)
-        new_ver = version_manager.get_version(doc_id, new_version_num)
+        if not user_id:
+            _seed_demo_versions()
+            old_ver = vm.get_version(doc_id, old_version_num)
+            new_ver = vm.get_version(doc_id, new_version_num)
+
+    if not old_ver or not new_ver:
+        return jsonify({"error": f"Versions not found for doc '{doc_id}'."}), 404
 
     comparison = evaluator.run_comparison(
         doc_id=doc_id,
@@ -152,26 +363,8 @@ def evaluate_comparison():
     return jsonify(comparison.to_dict())
 
 
-@version_bp.route("/rollback", methods=["POST"])
-def execute_version_rollback():
-    """Executes safe rollback to a target version without deleting session data."""
-    payload = request.get_json(silent=True) or {}
-    doc_id = payload.get("doc_id", "MERIDIAN_RULEBOOK")
-    target_version_num = payload.get("target_version", 2026)
-    session_id = payload.get("session_id", "demo_session")
-    dry_run = payload.get("dry_run", True)
-
-    report = rollback_mgr.execute_rollback(
-        document_id=doc_id,
-        target_version_num=target_version_num,
-        session_id=session_id,
-        dry_run=dry_run,
-    )
-    return jsonify(report.to_dict())
-
-
 def _seed_demo_versions():
-    """Seeds sample insurance policy versions for instant demo inspection."""
+    """Seeds sample insurance policy versions strictly for isolated demo inspection."""
     doc_id = "MERIDIAN_RULEBOOK"
     v2026_clauses = [
         {"clause_id": "1.1", "section": "1. PREAMBLE", "text": "This Policy constitutes the entire contract between Meridian Insurance Company and the Insured Policyholder."},

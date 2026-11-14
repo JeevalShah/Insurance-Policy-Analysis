@@ -69,7 +69,9 @@ def ensure_indexes() -> None:
         "CREATE INDEX reg_id_session IF NOT EXISTS FOR (n:RegulatoryClause) ON (n.id, n.session_id)",
         "CREATE INDEX pol_id_session IF NOT EXISTS FOR (n:PolicyClause) ON (n.id, n.session_id)",
         "CREATE INDEX reg_source IF NOT EXISTS FOR (n:RegulatoryClause) ON (n.source_doc)",
-        "CREATE INDEX pol_source IF NOT EXISTS FOR (n:PolicyClause) ON (n.source_doc)"
+        "CREATE INDEX pol_source IF NOT EXISTS FOR (n:PolicyClause) ON (n.source_doc)",
+        "CREATE INDEX reg_user_doc IF NOT EXISTS FOR (n:RegulatoryClause) ON (n.user_id, n.doc_id)",
+        "CREATE INDEX pol_user_doc IF NOT EXISTS FOR (n:PolicyClause) ON (n.user_id, n.doc_id)",
     ]
     
     with driver.session() as session:

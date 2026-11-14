@@ -77,6 +77,7 @@ class RollbackManager:
         target_version_num: int,
         session_id: str = "default_session",
         dry_run: bool = False,
+        user_id: Optional[str] = None,
     ) -> RollbackReport:
         """
         Rolls back the document state to target_version_num.
@@ -159,22 +160,26 @@ class RollbackManager:
                     with session.begin_transaction() as tx:
                         # Deactivate clauses that did not exist in target version
                         if clauses_to_deactivate:
-                            tx.run("""
-                            MATCH (n {session_id: $sid})
-                            WHERE n.id IN $ids AND n.doc_id = $doc_id
+                            where_deact = "AND (n.user_id = $uid OR n.user_id IS NULL)" if user_id else ""
+                            tx.run(f"""
+                            MATCH (n {{session_id: $sid}})
+                            WHERE n.id IN $ids AND n.doc_id = $doc_id {where_deact}
                             SET n.status = 'inactive',
                                 n.rolled_back_at = $ts
-                            """, {"sid": session_id, "ids": clauses_to_deactivate, "doc_id": document_id, "ts": ts})
+                            """, {"sid": session_id, "ids": clauses_to_deactivate, "doc_id": document_id, "ts": ts, "uid": user_id})
 
                         # Restore modified clauses
                         for c in clauses_to_restore:
-                            tx.run("""
-                            MATCH (n {session_id: $sid, id: $cid, doc_id: $doc_id})
+                            where_restore = "AND (n.user_id = $uid OR n.user_id IS NULL)" if user_id else ""
+                            tx.run(f"""
+                            MATCH (n {{session_id: $sid, id: $cid, doc_id: $doc_id}})
+                            WHERE 1=1 {where_restore}
                             SET n.text = $text,
                                 n.text_fingerprint = $fp,
                                 n.version_num = $target_ver,
                                 n.status = 'active',
-                                n.restored_at = $ts
+                                n.restored_at = $ts,
+                                n.user_id = $uid
                             """, {
                                 "sid": session_id,
                                 "cid": c.clause_id,
@@ -182,7 +187,8 @@ class RollbackManager:
                                 "text": c.text,
                                 "fp": c.text_fingerprint,
                                 "target_ver": target_version_num,
-                                "ts": ts
+                                "ts": ts,
+                                "uid": user_id,
                             })
 
                         # Reactivate clauses deleted in later versions
@@ -191,6 +197,7 @@ class RollbackManager:
                             tx.run("""
                             MERGE (n:PolicyClause {id: $cid, session_id: $sid})
                             SET n.doc_id = $doc_id,
+                                n.user_id = $uid,
                                 n.version_num = $target_ver,
                                 n.text = $text,
                                 n.text_fingerprint = $fp,
@@ -203,7 +210,8 @@ class RollbackManager:
                                 "target_ver": target_version_num,
                                 "text": c.text,
                                 "fp": c.text_fingerprint,
-                                "ts": ts
+                                "ts": ts,
+                                "uid": user_id,
                             })
 
                         tx.commit()
