@@ -1,0 +1,70 @@
+{
+  "document_id": "MERIDIAN_RULEBOOK",
+  "record_count": 2,
+  "records": [
+    {
+      "update_id": "b9ff6e63-ba29-4779-b113-7ab80353886e",
+      "document_id": "MERIDIAN_RULEBOOK",
+      "session_id": "demo_session",
+      "old_version": 2026,
+      "new_version": 2027,
+      "timestamp": 1794601859.269264,
+      "status": "dry_run",
+      "added_count": 1,
+      "modified_count": 2,
+      "deleted_count": 1,
+      "unchanged_count": 2,
+      "nodes_created": 1,
+      "nodes_updated": 2,
+      "nodes_deactivated": 1,
+      "relationships_deactivated": 3,
+      "relationships_created": 0,
+      "duration_seconds": 0.0,
+      "errors": [],
+      "manifest_id": null,
+      "manifest_summary": {
+        "added_count": 1,
+        "modified_count": 2,
+        "deleted_count": 1,
+        "unchanged_count": 2,
+        "split_count": 0,
+        "merged_count": 0,
+        "ambiguous_count": 0,
+        "total_changes": 4
+      },
+      "details": {}
+    },
+    {
+      "update_id": "647c54aa-aa1d-4f7d-b234-b75efac13f01",
+      "document_id": "MERIDIAN_RULEBOOK",
+      "session_id": "demo_session",
+      "old_version": 2026,
+      "new_version": 2027,
+      "timestamp": 1794601888.4703143,
+      "status": "dry_run",
+      "added_count": 1,
+      "modified_count": 2,
+      "deleted_count": 1,
+      "unchanged_count": 2,
+      "nodes_created": 1,
+      "nodes_updated": 2,
+      "nodes_deactivated": 1,
+      "relationships_deactivated": 3,
+      "relationships_created": 0,
+      "duration_seconds": 0.0001,
+      "errors": [],
+      "manifest_id": null,
+      "manifest_summary": {
+        "added_count": 1,
+        "modified_count": 2,
+        "deleted_count": 1,
+        "unchanged_count": 2,
+        "split_count": 0,
+        "merged_count": 0,
+        "ambiguous_count": 0,
+        "total_changes": 4
+      },
+      "details": {}
+    }
+  ]
+}

@@ -23,6 +23,7 @@ from reasoning.dependency_graph import build_dependency_graph
 from embeddings.embedder import PolicyEmbedder
 from parsing import pdf_parsing, docx_parsing
 from clause_extraction.clause_split import split_into_clauses
+from versioning.version_routes import version_bp
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("App")
@@ -31,6 +32,9 @@ app = Flask(__name__)
 CORS(app)
 MAX_CONTENT_LENGTH = 50 * 1024 * 1024
 app.config["MAX_CONTENT_LENGTH"] = MAX_CONTENT_LENGTH
+
+# Additive Version-Aware Maintenance Blueprint
+app.register_blueprint(version_bp, url_prefix="/api/version")
 
 # --- NEW: Simple LLM Client Wrapper to replace `None` ---
 class LocalOllamaClient:

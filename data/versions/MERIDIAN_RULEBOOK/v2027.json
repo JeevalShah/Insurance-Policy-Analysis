@@ -1,0 +1,89 @@
+{
+  "doc_id": "MERIDIAN_RULEBOOK",
+  "version_num": 2027,
+  "content_fingerprint": "944dceecd9d3175fbc913559424c7ee43f5cc008b1165328d9e82c44d393ca8a",
+  "upload_timestamp": 1794602146.7662368,
+  "previous_version_num": 2026,
+  "version_tag": "v2027",
+  "doc_type": "unknown",
+  "status": "active",
+  "clause_count": 5,
+  "clauses": [
+    {
+      "stable_clause_id": "MERIDIAN_RULEBOOK::1__PREAMBLE::none::1.1#0",
+      "clause_id": "1.1",
+      "doc_id": "MERIDIAN_RULEBOOK",
+      "version_num": 2027,
+      "text": "This Policy constitutes the entire contract between Meridian Insurance Company and the Insured Policyholder.",
+      "text_fingerprint": "c72ce7af810741329e2f8e19b2091aa3a5eb5301e7dc441aecf0e6715738bbb1",
+      "section": "1. PREAMBLE",
+      "parent_id": null,
+      "ordinal": 0,
+      "metadata": {
+        "source_doc": "",
+        "occurrence_index": 0
+      }
+    },
+    {
+      "stable_clause_id": "MERIDIAN_RULEBOOK::2__CLAIMS_SETTLEMENT::none::2.1#1",
+      "clause_id": "2.1",
+      "doc_id": "MERIDIAN_RULEBOOK",
+      "version_num": 2027,
+      "text": "The Insurer shall settle all verified claims within fifteen (15) business days from receipt of all survey reports.",
+      "text_fingerprint": "a11982fbd3545686f39ce71d30d5a6328ca68a806df1accd825f92ed7419d862",
+      "section": "2. CLAIMS SETTLEMENT",
+      "parent_id": null,
+      "ordinal": 1,
+      "metadata": {
+        "source_doc": "",
+        "occurrence_index": 0
+      }
+    },
+    {
+      "stable_clause_id": "MERIDIAN_RULEBOOK::2__CLAIMS_SETTLEMENT::none::2.2#2",
+      "clause_id": "2.2",
+      "doc_id": "MERIDIAN_RULEBOOK",
+      "version_num": 2027,
+      "text": "Proof of loss must be certified by an IRDAI-licensed independent surveyor for all claims exceeding INR 50,000.",
+      "text_fingerprint": "1e40085a9a57b8db3766c9348d5650abe52ded86bce400527741af236dbc7756",
+      "section": "2. CLAIMS SETTLEMENT",
+      "parent_id": null,
+      "ordinal": 2,
+      "metadata": {
+        "source_doc": "",
+        "occurrence_index": 0
+      }
+    },
+    {
+      "stable_clause_id": "MERIDIAN_RULEBOOK::3__NOTICES::none::3.1#3",
+      "clause_id": "3.1",
+      "doc_id": "MERIDIAN_RULEBOOK",
+      "version_num": 2027,
+      "text": "Notice of claim must be tendered through the customer support digital web portal or mobile app within 48 hours.",
+      "text_fingerprint": "b7f6f91a15e15907094f97d132fd7429c669f593dcc3b9aaf58266b70afec089",
+      "section": "3. NOTICES",
+      "parent_id": null,
+      "ordinal": 3,
+      "metadata": {
+        "source_doc": "",
+        "occurrence_index": 0
+      }
+    },
+    {
+      "stable_clause_id": "MERIDIAN_RULEBOOK::4__CYBER_EXTORTION::none::4.1#4",
+      "clause_id": "4.1",
+      "doc_id": "MERIDIAN_RULEBOOK",
+      "version_num": 2027,
+      "text": "Coverage is extended to ransomware extortion demands subject to prior written consent of the Insurer's incident response team.",
+      "text_fingerprint": "deceb02f9af9d5576ab7b7c1f3de03c0e28e58fe588f80e8210571f305aa7850",
+      "section": "4. CYBER EXTORTION",
+      "parent_id": null,
+      "ordinal": 4,
+      "metadata": {
+        "source_doc": "",
+        "occurrence_index": 0
+      }
+    }
+  ],
+  "metadata": {}
+}

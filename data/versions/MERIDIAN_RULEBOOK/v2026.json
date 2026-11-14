@@ -1,0 +1,89 @@
+{
+  "doc_id": "MERIDIAN_RULEBOOK",
+  "version_num": 2026,
+  "content_fingerprint": "57edabe73dab37530e8a13c3761677a89028f0cac4eedbd61ec3cf054e3ce853",
+  "upload_timestamp": 1794602146.7576828,
+  "previous_version_num": null,
+  "version_tag": "v2026",
+  "doc_type": "unknown",
+  "status": "archived",
+  "clause_count": 5,
+  "clauses": [
+    {
+      "stable_clause_id": "MERIDIAN_RULEBOOK::1__PREAMBLE::none::1.1#0",
+      "clause_id": "1.1",
+      "doc_id": "MERIDIAN_RULEBOOK",
+      "version_num": 2026,
+      "text": "This Policy constitutes the entire contract between Meridian Insurance Company and the Insured Policyholder.",
+      "text_fingerprint": "c72ce7af810741329e2f8e19b2091aa3a5eb5301e7dc441aecf0e6715738bbb1",
+      "section": "1. PREAMBLE",
+      "parent_id": null,
+      "ordinal": 0,
+      "metadata": {
+        "source_doc": "",
+        "occurrence_index": 0
+      }
+    },
+    {
+      "stable_clause_id": "MERIDIAN_RULEBOOK::2__CLAIMS_SETTLEMENT::none::2.1#1",
+      "clause_id": "2.1",
+      "doc_id": "MERIDIAN_RULEBOOK",
+      "version_num": 2026,
+      "text": "The Insurer shall settle all verified claims within thirty (30) calendar days from receipt of all survey reports.",
+      "text_fingerprint": "a31f934892d5391fe26353b04a61991878c92bc8164006192ca9218b4f366bb1",
+      "section": "2. CLAIMS SETTLEMENT",
+      "parent_id": null,
+      "ordinal": 1,
+      "metadata": {
+        "source_doc": "",
+        "occurrence_index": 0
+      }
+    },
+    {
+      "stable_clause_id": "MERIDIAN_RULEBOOK::2__CLAIMS_SETTLEMENT::none::2.2#2",
+      "clause_id": "2.2",
+      "doc_id": "MERIDIAN_RULEBOOK",
+      "version_num": 2026,
+      "text": "Proof of loss must be certified by an IRDAI-licensed independent surveyor for all claims exceeding INR 50,000.",
+      "text_fingerprint": "1e40085a9a57b8db3766c9348d5650abe52ded86bce400527741af236dbc7756",
+      "section": "2. CLAIMS SETTLEMENT",
+      "parent_id": null,
+      "ordinal": 2,
+      "metadata": {
+        "source_doc": "",
+        "occurrence_index": 0
+      }
+    },
+    {
+      "stable_clause_id": "MERIDIAN_RULEBOOK::3__NOTICES::none::3.1#3",
+      "clause_id": "3.1",
+      "doc_id": "MERIDIAN_RULEBOOK",
+      "version_num": 2026,
+      "text": "Immediate notice of loss may be transmitted by telegraphic dispatch or facsimile machine to the zonal branch office.",
+      "text_fingerprint": "dcd25235a1d95bfc860cdb61ebf75c1bf582ddc8e8d2fe11baaec15c71bd63aa",
+      "section": "3. NOTICES",
+      "parent_id": null,
+      "ordinal": 3,
+      "metadata": {
+        "source_doc": "",
+        "occurrence_index": 0
+      }
+    },
+    {
+      "stable_clause_id": "MERIDIAN_RULEBOOK::3__NOTICES::none::3.2#4",
+      "clause_id": "3.2",
+      "doc_id": "MERIDIAN_RULEBOOK",
+      "version_num": 2026,
+      "text": "Notice of claim may also be tendered through the customer support online web portal within 48 hours.",
+      "text_fingerprint": "bef05c3fc2659bd25a5105d956e36f7ee85706bbf8fbb75183dc6d26c4c89cd9",
+      "section": "3. NOTICES",
+      "parent_id": null,
+      "ordinal": 4,
+      "metadata": {
+        "source_doc": "",
+        "occurrence_index": 0
+      }
+    }
+  ],
+  "metadata": {}
+}
